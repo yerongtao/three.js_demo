@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义形状</title>
+    <link rel="stylesheet" href="">
+    <script type="text/javascript" src="../three.js_demo/lib/three.js"></script>
+    <script type="text/javascript">
+        function init() {
+            //渲染器（Renderer）
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(400, 300);
+            document.getElementsByTagName('body')[0].appendChild(renderer.domElement);
+            renderer.setClearColor(0x000000);
+            //场景（Scene）
+            var scene = new THREE.Scene();
+            //照相机（Camera）
+            var camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+            camera.position.set(25, 25, 25);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+            scene.add(camera);
+            //实体
+            //绘制坐标轴帮助理解
+            drawAxes(scene);
+            //梯台
+            drawGeometry(scene);
+
+            //渲染（render）
+            renderer.render(scene, camera);
+
+            //实体-梯台
+            function drawGeometry() {
+                // 初始化几何形状
+                var geometry = new THREE.Geometry();
+                // 设置顶点位置
+                // 顶部4顶点
+                geometry.vertices.push(new THREE.Vector3(-1, 2, -1));
+                geometry.vertices.push(new THREE.Vector3(1, 2, -1));
+                geometry.vertices.push(new THREE.Vector3(1, 2, 1));
+                geometry.vertices.push(new THREE.Vector3(-1, 2, 1));
+                // 底部4顶点
+                geometry.vertices.push(new THREE.Vector3(-2, 0, -2));
+                geometry.vertices.push(new THREE.Vector3(2, 0, -2));
+                geometry.vertices.push(new THREE.Vector3(2, 0, 2));
+                geometry.vertices.push(new THREE.Vector3(-2, 0, 2));
+                // 设置顶点连接情况
+                // 顶面
+                geometry.faces.push(new THREE.Face3(0, 1, 3));
+                geometry.faces.push(new THREE.Face3(1, 2, 3));
+                // 底面
+                geometry.faces.push(new THREE.Face3(4, 5, 6));
+                geometry.faces.push(new THREE.Face3(5, 6, 7));
+                // 四个侧面
+                geometry.faces.push(new THREE.Face3(1, 5, 6));
+                geometry.faces.push(new THREE.Face3(6, 2, 1));
+                geometry.faces.push(new THREE.Face3(2, 6, 7));
+                geometry.faces.push(new THREE.Face3(7, 3, 2));
+                geometry.faces.push(new THREE.Face3(3, 7, 0));
+                geometry.faces.push(new THREE.Face3(7, 4, 0));
+                geometry.faces.push(new THREE.Face3(0, 4, 5));
+                geometry.faces.push(new THREE.Face3(0, 5, 1));
+
+                var mesh = new THREE.Mesh(geometry,
+                    new THREE.MeshBasicMaterial({
+                        color: 0xff00ff,
+                        wireframe: true
+                    })
+                );
+                scene.add(mesh);
+            }
+
+            //坐标轴x-y-z
+            function drawAxes(scene) {
+                // x-axis
+                var xGeo = new THREE.Geometry();
+                xGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+                xGeo.vertices.push(new THREE.Vector3(1, 0, 0));
+                var xMat = new THREE.LineBasicMaterial({
+                    color: 0xff0000
+                });
+                var xAxis = new THREE.Line(xGeo, xMat);
+                scene.add(xAxis);
+
+                // y-axis
+                var yGeo = new THREE.Geometry();
+                yGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+                yGeo.vertices.push(new THREE.Vector3(0, 1, 0));
+                var yMat = new THREE.LineBasicMaterial({
+                    color: 0x00ff00
+                });
+                var yAxis = new THREE.Line(yGeo, yMat);
+                scene.add(yAxis);
+
+                // z-axis
+                var zGeo = new THREE.Geometry();
+                zGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+                zGeo.vertices.push(new THREE.Vector3(0, 0, 1));
+                var zMat = new THREE.LineBasicMaterial({
+                    color: 0x00ccff
+                });
+                var zAxis = new THREE.Line(zGeo, zMat);
+                scene.add(zAxis);
+            }
+
+        }
+    </script>
+</head>
+<body onload="init()">
+<!--<canvas id="mainCanvas" width="400px" height="300px" ></canvas>-->
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js</title>
+    <link rel="stylesheet" href="">
+    <script type="text/javascript" src="../three.js_demo/lib/three.js"></script>
+    <script type="text/javascript">
+        function init() {
+            //渲染器（Renderer）
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(400, 300);
+            document.getElementsByTagName('body')[0].appendChild(renderer.domElement); //将渲染器对应的Canvas元素添加到<body>中
+            renderer.setClearColor(0x000000);  //将背景色（用于清除画面的颜色）设置为黑色
+            //场景（Scene）
+            var scene = new THREE.Scene();
+            //照相机（Camera）
+            var camera = new THREE.PerspectiveCamera(45, 4 / 3, 1, 1000);
+            camera.position.set(0, 0, 5);
+            scene.add(camera);
+            //创建一个x、y、z方向长度分别为1、2、3的长方体
+            var cube = new THREE.Mesh(new THREE.CubeGeometry(1, 2, 3),
+                new THREE.MeshBasicMaterial({
+                    color: 0xff0000     //将其设置为红色
+                })
+            );
+            scene.add(cube);
+            //渲染（render）
+            renderer.render(scene, camera);
+        }
+    </script>
+</head>
+<body onload="init()">
+<!--<canvas id="mainCanvas" width="400px" height="300px" ></canvas>-->
+</body>
+</html>
