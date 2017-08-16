@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <title>创建动画</title>
     <link rel="stylesheet" href="">
-    <script type="text/javascript" src="../three.js_demo/lib/three.js"></script>
+    <script type="text/javascript" src="../lib/three.js"></script>
     <script type="text/javascript">
+        var renderer = null,
+            scene = null,
+            camera = null;
         function init() {
             //渲染器（Renderer）
-            var renderer = new THREE.WebGLRenderer();
+            renderer = new THREE.WebGLRenderer();
             renderer.setSize(400, 300);
             document.getElementsByTagName('body')[0].appendChild(renderer.domElement);
             renderer.setClearColor(0x000000);
             //场景（Scene）
-            var scene = new THREE.Scene();
+            scene = new THREE.Scene();
             //照相机（Camera）
-            var camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+            camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
             camera.position.set(10, 15, 20);
             camera.lookAt(new THREE.Vector3(0, 0, 0));
             scene.add(camera);
@@ -33,6 +36,7 @@
             id = setInterval(draw, 20);
 
             function draw() {
+                //设置旋转
 //                mesh.rotation.x = (mesh.rotation.x + 0.01) % (Math.PI * 2);
                 mesh.rotation.y = (mesh.rotation.y + 0.01) % (Math.PI * 2);
 //                mesh.rotation.z = (mesh.rotation.z + 0.01) % (Math.PI * 2);
@@ -40,17 +44,12 @@
                 renderer.render(scene, camera);
             }
 
-            function stop1() {
-                if (id !== null) {
-                    clearInterval(id);
-                    id = null;
-                } else {
-                    id = setInterval(draw, 20);
-                }
-            }
         }
         function stop() {
-            stop1();
+            if (id !== null) {
+                clearInterval(id);
+                id = null;
+            }
         }
 
 

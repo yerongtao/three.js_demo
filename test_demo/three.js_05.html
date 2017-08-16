@@ -4,25 +4,27 @@
     <meta charset="UTF-8">
     <title>材质光源</title>
     <link rel="stylesheet" href="">
-    <script type="text/javascript" src="../three.js_demo/lib/three.js"></script>
+    <script type="text/javascript" src="../lib/three.js"></script>
+
     <script type="text/javascript">
         function init() {
             //渲染器（Renderer）
             var renderer = new THREE.WebGLRenderer();
-            renderer.setSize(400, 300);
+            renderer.setSize(1000, 800);
             document.getElementsByTagName('body')[0].appendChild(renderer.domElement);
             renderer.setClearColor(0x666666);
             //场景（Scene）
             var scene = new THREE.Scene();
             //照相机（Camera）
             var camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
-            camera.position.set(25, 25, 25);
+            camera.position.set(25, 20, 20);
+
             //棋盘格需要的照相机位置不同
             /*var camera = new THREE.OrthographicCamera(-10, 10, 7.5, -7.5, 0.1, 100);
             camera.position.set(0, 0, 25);*/
+
             camera.lookAt(new THREE.Vector3(0, 0, 0));
             scene.add(camera);
-
 
 
             //光源（Light）
@@ -30,6 +32,7 @@
             light.position.set(10, 15, 20);
             scene.add(light);
 
+        //-------材质---------
             //创建Lambert材质
             var materialLambert = new THREE.MeshLambertMaterial({
                 color: 0xffff00,//颜色设置为黄色
@@ -42,7 +45,7 @@
                 shininess: 1000//通过shininess属性控制光照模型中的n值，值越大，高光的光斑越小，默认值为30
             });
             //创建贴图材质
-            var texture = THREE.ImageUtils.loadTexture('img/2.jpg', {}, function() {//导入纹理图形
+            var texture = THREE.ImageUtils.loadTexture('../img/2.jpg', {}, function() {//导入纹理图形
                 renderer.render(scene, camera);//重绘函数
             });
             var materialMap = new THREE.MeshLambertMaterial({
@@ -52,7 +55,7 @@
             var materialsMaps = [];
             for (var i = 1; i < 7; ++i) {
                 materialsMaps.push(new THREE.MeshBasicMaterial({
-                    map: THREE.ImageUtils.loadTexture('img/' + i + '.jpg',
+                    map: THREE.ImageUtils.loadTexture('../img/' + i + '.jpg',
                         {}, function() {
                             renderer.render(scene, camera);
                         }),
@@ -60,14 +63,15 @@
                 }));
             }
             //一个黑白格
-            var textureChess = THREE.ImageUtils.loadTexture('img/chess.png', {}, function() {
+            var textureChess = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
                 renderer.render(scene, camera);//重绘函数
             });
             var materialChess = new THREE.MeshLambertMaterial({
                 map: textureChess//材质的map属性设置为textureChess
             });
+
             //棋盘格:是8横8纵64个小方格
-            var textureChessA = THREE.ImageUtils.loadTexture('img/chess.png', {}, function() {
+            var textureChessA = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
                 renderer.render(scene, camera);//重绘函数
             });
             textureChessA.wrapS = textureChessA.wrapT = THREE.RepeatWrapping;//指定重复方式为两个方向（wrapS和wrapT）都重复
@@ -75,6 +79,7 @@
             var materialChessA = new THREE.MeshLambertMaterial({
                 map: textureChessA//textureChessA
             });
+
 
             //-----绘制坐标轴帮助理解
             drawAxes(scene);
@@ -87,24 +92,53 @@
             //实体
             function drawGeometry(scene) {
                 //Lambert材质立方体
-                /*var cubeLambert = new THREE.Mesh(new THREE.CubeGeometry(4, 4, 4), materialLambert);
-                scene.add(cubeLambert);*/
+                var cubeLambert = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2), materialLambert);
+                cubeLambert.position.set(-3, 1, 1);
+                scene.add(cubeLambert);
+
                 //Lambert材质球体
-                /*var sphereLambert = new THREE.Mesh(new THREE.SphereGeometry(3, 20, 8), materialLambert);
-                scene.add(sphereLambert);*/
+                var sphereLambert = new THREE.Mesh(new THREE.SphereGeometry(0.8, 20, 7), materialLambert);
+                sphereLambert.position.set(4, 1, 1);
+                scene.add(sphereLambert);
+
                 //Phong材质球体
-                /*var spherePhong = new THREE.Mesh(new THREE.SphereGeometry(3, 20, 8), materialPhong);
-                scene.add(spherePhong);*/
+                var spherePhong = new THREE.Mesh(new THREE.SphereGeometry(0.8, 20, 8), materialPhong);
+                spherePhong.position.set(4, 1, 4);
+                scene.add(spherePhong);
+
                 //贴图材质
-                /*var cubeMap = new THREE.Mesh(new THREE.CubeGeometry(4, 4, 4), materialMap);
-                scene.add(cubeMap);*/
+                var cubeMap = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2), materialMap);
+                cubeMap.position.set(-0.5, 1, 4);
+                scene.add(cubeMap);
+
                 //多贴图材质
-                var cubeMaps = new THREE.Mesh(new THREE.CubeGeometry(5, 5, 5),
+                var cubeMaps = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2),
                     new THREE.MeshFaceMaterial(materialsMaps));
+                cubeMaps.position.set(0, 1, -1);
                 scene.add(cubeMaps);
+
                 //棋盘格
-                /*var planeChessA = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), materialChessA);
-                scene.add(planeChessA);*/
+                var planeChessA = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), materialChessA);
+                planeChessA.position.set(-10, -10, -10);
+                scene.add(planeChessA);
+
+
+                //设置旋转
+                setInterval(draw, 20);
+                function draw() {
+                    cubeLambert.rotation.z = (cubeLambert.rotation.z + 0.01) % (Math.PI * 2);
+
+                    cubeMap.rotation.y = (cubeMap.rotation.y + 0.01) % (Math.PI * 2);
+
+                    cubeMaps.rotation.x = (cubeMaps.rotation.x + 0.01) % (Math.PI * 2);
+                    cubeMaps.rotation.y = (cubeMaps.rotation.y + 0.01) % (Math.PI * 2);
+                    //mesh.rotation.z = (mesh.rotation.z + 0.01) % (Math.PI * 2);
+
+                    sphereLambert.rotation.y = (sphereLambert.rotation.y + 0.01) % (Math.PI * 2);
+
+                    //渲染（render）
+                    renderer.render(scene, camera);
+                }
             }
 
             //坐标轴x-y-z
@@ -139,6 +173,7 @@
                 var zAxis = new THREE.Line(zGeo, zMat);
                 scene.add(zAxis);
             }
+
 
         }
     </script>
