@@ -2,183 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>材质光源</title>
+    <title>创建物体旋转动画</title>
     <link rel="stylesheet" href="">
-    <script type="text/javascript" src="../lib/three.js"></script>
-
+    <script type="text/javascript" src="../js/three.js"></script>
     <script type="text/javascript">
+        var scene = null;
+        var camera = null;
+        var renderer = null;
+        var mesh = null;
+        var id = null;
         function init() {
             //渲染器（Renderer）
-            var renderer = new THREE.WebGLRenderer();
-            renderer.setSize(1000, 800);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(400, 300);
             document.getElementsByTagName('body')[0].appendChild(renderer.domElement);
-            renderer.setClearColor(0x666666);
+            renderer.setClearColor(0x000000);
             //场景（Scene）
-            var scene = new THREE.Scene();
+            scene = new THREE.Scene();
             //照相机（Camera）
-            var camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
-            camera.position.set(25, 20, 20);
-
-            //棋盘格需要的照相机位置不同
-            /*var camera = new THREE.OrthographicCamera(-10, 10, 7.5, -7.5, 0.1, 100);
-            camera.position.set(0, 0, 25);*/
-
+            camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+            camera.position.set(10, 15, 20);
             camera.lookAt(new THREE.Vector3(0, 0, 0));
             scene.add(camera);
-
-
             //光源（Light）
-            var light = new THREE.PointLight(0xffffff, 1, 1000);
-            light.position.set(10, 15, 20);
+            var light = new THREE.DirectionalLight(0xffffff);
+            light.position.set(15, 10, 5);
             scene.add(light);
-
-        //-------材质---------
-            //创建Lambert材质
-            var materialLambert = new THREE.MeshLambertMaterial({
-                color: 0xffff00,//颜色设置为黄色
-                emissive: 0xff0000//emissive是材质的自发光颜色
-            });
-            //创建Phong材质
-            var materialPhong = new THREE.MeshPhongMaterial({
-                color: 0xff0000,//黄色的镜面光
-                specular: 0xff0000,//红色的散射光
-                shininess: 1000//通过shininess属性控制光照模型中的n值，值越大，高光的光斑越小，默认值为30
-            });
-            //创建贴图材质
-            var texture = THREE.ImageUtils.loadTexture('../img/2.jpg', {}, function() {//导入纹理图形
-                renderer.render(scene, camera);//重绘函数
-            });
-            var materialMap = new THREE.MeshLambertMaterial({
-                map: texture//材质的map属性设置为texture
-            });
-            //创建多贴图材质
-            var materialsMaps = [];
-            for (var i = 1; i < 7; ++i) {
-                materialsMaps.push(new THREE.MeshBasicMaterial({
-                    map: THREE.ImageUtils.loadTexture('../img/' + i + '.jpg',
-                        {}, function() {
-                            renderer.render(scene, camera);
-                        }),
-                    overdraw: true
-                }));
-            }
-            //一个黑白格
-            var textureChess = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
-                renderer.render(scene, camera);//重绘函数
-            });
-            var materialChess = new THREE.MeshLambertMaterial({
-                map: textureChess//材质的map属性设置为textureChess
-            });
-
-            //棋盘格:是8横8纵64个小方格
-            var textureChessA = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
-                renderer.render(scene, camera);//重绘函数
-            });
-            textureChessA.wrapS = textureChessA.wrapT = THREE.RepeatWrapping;//指定重复方式为两个方向（wrapS和wrapT）都重复
-            textureChessA.repeat.set(4, 4);//设置两个方向上都重复4次
-            var materialChessA = new THREE.MeshLambertMaterial({
-                map: textureChessA//textureChessA
-            });
-
-
-            //-----绘制坐标轴帮助理解
-            drawAxes(scene);
-            //-----实体
-            drawGeometry(scene);
-
-            //渲染（render）
-            renderer.render(scene, camera);
-
             //实体
-            function drawGeometry(scene) {
-                //Lambert材质立方体
-                var cubeLambert = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2), materialLambert);
-                cubeLambert.position.set(-3, 1, 1);
-                scene.add(cubeLambert);
+            mesh = new THREE.Mesh(new THREE.CubeGeometry(1, 2, 3),
+                new THREE.MeshLambertMaterial({
+                    color: 0xffff00
+                }));
+            scene.add(mesh);
 
-                //Lambert材质球体
-                var sphereLambert = new THREE.Mesh(new THREE.SphereGeometry(0.8, 20, 7), materialLambert);
-                sphereLambert.position.set(4, 1, 1);
-                scene.add(sphereLambert);
-
-                //Phong材质球体
-                var spherePhong = new THREE.Mesh(new THREE.SphereGeometry(0.8, 20, 8), materialPhong);
-                spherePhong.position.set(4, 1, 4);
-                scene.add(spherePhong);
-
-                //贴图材质
-                var cubeMap = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2), materialMap);
-                cubeMap.position.set(-0.5, 1, 4);
-                scene.add(cubeMap);
-
-                //多贴图材质
-                var cubeMaps = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2),
-                    new THREE.MeshFaceMaterial(materialsMaps));
-                cubeMaps.position.set(0, 1, -1);
-                scene.add(cubeMaps);
-
-                //棋盘格
-                var planeChessA = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), materialChessA);
-                planeChessA.position.set(-10, -10, -10);
-                scene.add(planeChessA);
-
-
-                //设置旋转
-                setInterval(draw, 20);
-                function draw() {
-                    cubeLambert.rotation.z = (cubeLambert.rotation.z + 0.01) % (Math.PI * 2);
-
-                    cubeMap.rotation.y = (cubeMap.rotation.y + 0.01) % (Math.PI * 2);
-
-                    cubeMaps.rotation.x = (cubeMaps.rotation.x + 0.01) % (Math.PI * 2);
-                    cubeMaps.rotation.y = (cubeMaps.rotation.y + 0.01) % (Math.PI * 2);
-                    //mesh.rotation.z = (mesh.rotation.z + 0.01) % (Math.PI * 2);
-
-                    sphereLambert.rotation.y = (sphereLambert.rotation.y + 0.01) % (Math.PI * 2);
-
-                    //渲染（render）
-                    renderer.render(scene, camera);
-                }
-            }
-
-            //坐标轴x-y-z
-            function drawAxes(scene) {
-                // x-axis
-                var xGeo = new THREE.Geometry();
-                xGeo.vertices.push(new THREE.Vector3(0, 0, 0));
-                xGeo.vertices.push(new THREE.Vector3(1, 0, 0));
-                var xMat = new THREE.LineBasicMaterial({
-                    color: 0xff0000
-                });
-                var xAxis = new THREE.Line(xGeo, xMat);
-                scene.add(xAxis);
-
-                // y-axis
-                var yGeo = new THREE.Geometry();
-                yGeo.vertices.push(new THREE.Vector3(0, 0, 0));
-                yGeo.vertices.push(new THREE.Vector3(0, 1, 0));
-                var yMat = new THREE.LineBasicMaterial({
-                    color: 0x00ff00
-                });
-                var yAxis = new THREE.Line(yGeo, yMat);
-                scene.add(yAxis);
-
-                // z-axis
-                var zGeo = new THREE.Geometry();
-                zGeo.vertices.push(new THREE.Vector3(0, 0, 0));
-                zGeo.vertices.push(new THREE.Vector3(0, 0, 1));
-                var zMat = new THREE.LineBasicMaterial({
-                    color: 0x00ccff
-                });
-                var zAxis = new THREE.Line(zGeo, zMat);
-                scene.add(zAxis);
-            }
-
+            id = setInterval(draw, 20);
 
         }
+        function draw() {
+            //设置旋转
+//                mesh.rotation.x = (mesh.rotation.x + 0.01) % (Math.PI * 2);
+            mesh.rotation.y = (mesh.rotation.y + 0.01) % (Math.PI * 2);
+//                mesh.rotation.z = (mesh.rotation.z + 0.01) % (Math.PI * 2);
+            //渲染（render）
+            renderer.render(scene, camera);
+        }
+        function stop() {
+            if (id !== null) {
+                clearInterval(id);
+                id = null;
+            }else {
+                id = setInterval(draw, 20);
+            }
+        }
+
+
     </script>
 </head>
 <body onload="init()">
 <!--<canvas id="mainCanvas" width="400px" height="300px" ></canvas>-->
+<button id="stopBtn"  onclick="stop()">stop</button>
 </body>
 </html>
