@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js canvas - panorama demo</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<title>一个视觉效果的错觉，在空间内观察天地的感觉</title>
@@ -39,8 +38,8 @@
 
 <script src="js/three.js"></script>
 
-<script src="js/Projector.js"></script>
-<script src="js/CanvasRenderer.js"></script>
+<!--<script src="js/Projector.js"></script>-->
+<!--<script src="js/CanvasRenderer.js"></script>-->
 
 <script>
 
@@ -69,13 +68,13 @@
         //场景
         scene = new THREE.Scene();
 
-        texture_placeholder = document.createElement( 'canvas' );
+      /*  texture_placeholder = document.createElement( 'canvas' );
         texture_placeholder.width = 128;
         texture_placeholder.height = 128;
 
         var context = texture_placeholder.getContext( '2d' );
         context.fillStyle = 'rgb( 200, 200, 200 )';
-        context.fillRect( 0, 0, texture_placeholder.width, texture_placeholder.height );
+        context.fillRect( 0, 0, texture_placeholder.width, texture_placeholder.height );*/
 
         var materials = [
 
@@ -108,6 +107,7 @@
         document.addEventListener( 'mousedown', onDocumentMouseDown, false );
         document.addEventListener( 'mousemove', onDocumentMouseMove, false );
         document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+        //鼠标滚轮控制缩放
         document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
         document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -180,8 +180,9 @@
 
     }
 
+    //鼠标滚轮滚动时，控制缩放
     function onDocumentMouseWheel( event ) {
-
+        //控制缩放其实是改变照相机位置，照相机离得远了，物体就变小了
         camera.fov += event.deltaY * 0.05;
         camera.updateProjectionMatrix();
 
@@ -218,7 +219,7 @@
     }
 
     function animate() {
-        requestAnimationFrame( animate );
+        requestAnimationFrame( animate );//递归调用
         update();
     }
 
