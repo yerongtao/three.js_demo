@@ -96,12 +96,16 @@
         scene.add(circles[2]);
         scene.add(circles[3]);
         //光
-        var light = new THREE.PointLight(0xffffff, 2, 100);
+        var light1 = new THREE.AmbientLight(0x555555);
+        light1.position.set(6, 6, 10);
+        scene.add(light1);
+         var light = new THREE.PointLight(0xffffff, 2, 100);
         light.position.set(6, 6, 10);
         scene.add(light);
         light.castShadow = true;
         light.shadowMapWidth = 2048;
         light.shadowMapHeight = 2048;
+
         render();
         //开启动画
         function animate(){
