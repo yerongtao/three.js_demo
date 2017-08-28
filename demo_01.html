@@ -19,9 +19,12 @@
 <canvas id="mainCanvas" width="1600px" height="1200px"></canvas>
 
 <script type="text/javascript" src="js/three.js"></script>
+<script type="text/javascript" src="js/clock.js"></script>
+<script type="text/javascript" src="js/VTKLoader.js"></script>
 <script type="text/javascript" src="js/TrackballControls.js"></script>//鼠标控制缩放
 <script>
     function init() {
+
         //渲染器
         var renderer = new THREE.WebGLRenderer({
             canvas: document.getElementById('mainCanvas')});
@@ -95,6 +98,9 @@
         scene.add(circles[1]);
         scene.add(circles[2]);
         scene.add(circles[3]);
+
+
+
         //光
         var light1 = new THREE.AmbientLight(0x555555);
         light1.position.set(6, 6, 10);
@@ -109,8 +115,9 @@
         render();
         //开启动画
         function animate(){
-            requestAnimationFrame(animate);
+            renderer.render( scene, camera );
             controls.update();
+            requestAnimationFrame(animate);
         }
         //开启监听渲染
         function render() {
@@ -118,6 +125,8 @@
         }
         animate();
     }
+
+
 </script>
 </body>
 </html>
