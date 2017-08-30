@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)http://www.hewebgl.com/code/show/2.html -->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>纽约</title>
+    <style>
+        body {
+            background-color: #d8e7ff;
+            font-family: Monospace;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body youdao="bind">
+<script src="three.min.js"></script>
+<script src="js/controls/FirstPersonControls.js"></script>
+<script>
+
+   /* var threeObj = ["setClearColor", "innerWidth", "innerHeight", "setSize", "domElement", "appendChild", "body", "y", "position", "movementSpeed",
+        "lookSpeed", "lookVertical", "fog", "set", "add", "x", "rotation", "PI", "makeTranslation", "applyMatrix",
+        "splice", "faces", "faceVertexUvs", "random", "setRGB", "multiply", "clone", "floor", "z", "scale", 
+        "geometry", "length", "vertexColors", "merge", "GeometryUtils", "anisotropy", "getMaxAnisotropy", "needsUpdate", "VertexColors", "div", 
+        "createElement", "style", "absolute", "left", "0", "top", "15px", "width", "100%", "color", 
+        "rgba(0,0,64,0.5)", "textAlign", "center", "textContent", "click and hold to move forward", "now", "canvas", "height", "2d", "getContext", 
+        "fillStyle", "#ffffff", "fillRect", "rgb(", ",", "join", ")", "imageSmoothingEnabled", "webkitImageSmoothingEnabled", "mozImageSmoothingEnabled",
+        "drawImage", "update", "render"];*/
+
+    var scene, camera, renderer;
+    var light, controls;
+    var lastTime;
+
+    init();
+    animate();
+    //初始化函数
+    function init() {
+
+        //渲染器（Renderer）
+        renderer = new THREE.WebGLRenderer({antialias: false, alpha: false});
+        renderer.setClearColor(0xd8e7ff);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        //照相机（Camera）
+        camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 3000);
+        camera.position.y = 80;
+
+        //控制器（controls）FirstPersonControls第一人称控制器
+        controls = new THREE.FirstPersonControls(camera);
+        controls.movementSpeed = 20;//鼠标步进
+        controls.lookSpeed = 0.02;//查看速度
+        controls.lookVertical = true;
+
+
+        //场景（Scene）
+        scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0xd0e0f0, 0.0025);
+
+        //灯光（Light）
+        light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);//HemisphereLight(半球光)
+        light.position.set(0.75, 1, 0.25);
+        scene.add(light);
+
+
+        //实体
+        var meshObj = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), 
+            new THREE.MeshBasicMaterial({color: 0x101018}));
+        meshObj.rotation.x = -90 * Math.PI / 180;
+        scene.add(meshObj);
+        //
+        var mesh2Obj2 = new THREE.CubeGeometry(1, 1, 1);
+        mesh2Obj2.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0.5, 0));
+        mesh2Obj2.faces.splice(3, 1);
+        mesh2Obj2.faceVertexUvs[0].splice(3, 1);
+        mesh2Obj2.faceVertexUvs[0][2][0].set(0, 0);
+        mesh2Obj2.faceVertexUvs[0][2][1].set(0, 0);
+        mesh2Obj2.faceVertexUvs[0][2][2].set(0, 0);
+        mesh2Obj2.faceVertexUvs[0][2][3].set(0, 0);
+
+        var mesh1Obj = new THREE.Mesh(mesh2Obj2);
+        var geometryObj = new THREE.Geometry();
+        var light = new THREE.Color(0xffffff);
+        var colorObj = new THREE.Color(0x303050);
+
+        //设置纽约城市建筑
+        for (var i = 0; i < 20000; i++) {
+            
+            var mathObj = 1 - Math.random() * Math.random();
+            
+            var math2Obj = new THREE.Color().setRGB(mathObj + Math.random() * 0.1, mathObj, mathObj + Math.random() * 0.1);
+            
+            var mathLightObj = math2Obj.clone().multiply(light);
+            var mathColorObj = math2Obj.clone().multiply(colorObj);
+            
+            mesh1Obj.position.x = Math.floor(Math.random() * 200 - 100) * 10;
+            mesh1Obj.position.z = Math.floor(Math.random() * 200 - 100) * 10;
+            mesh1Obj.rotation.y = Math.random();
+            
+            mesh1Obj.scale.x = mesh1Obj.scale.z = Math.random() * Math.random() * Math.random() * Math.random() * 50 + 10;
+            mesh1Obj.scale.y = (Math.random() * Math.random() * Math.random() * mesh1Obj.scale.x) * 8 + 8;
+            
+            var mesh2Obj2 = mesh1Obj.geometry;
+            
+            for (var j = 0, k = mesh2Obj2.faces.length; j < k; j++) {
+                if (j === 2) {
+                    mesh2Obj2.faces[j].vertexColors = [math2Obj, math2Obj, math2Obj, math2Obj];
+                } else {
+                    mesh2Obj2.faces[j].vertexColors = [mathLightObj, mathColorObj, mathColorObj, mathLightObj];
+                }
+            }
+            THREE.GeometryUtils.merge(geometryObj, mesh1Obj);
+        }
+
+        //材质贴图
+        var textureObj = new THREE.Texture(generateTexture());
+        textureObj.anisotropy = renderer.getMaxAnisotropy();
+        textureObj.needsUpdate = true;
+        var meshGeoObj = new THREE.Mesh(geometryObj, new THREE.MeshLambertMaterial({
+            map: textureObj,
+            vertexColors: THREE.VertexColors
+        }));
+        scene.add(meshGeoObj);
+
+        //创建承载模型的容器div
+        var docuObj = document.createElement('div');
+        docuObj.style.position = 'absolute';
+        docuObj.style.left = 0;
+        docuObj.style.top = '15px';
+        docuObj.style.width = '100%';
+        docuObj.style.color = 'rgba(0,0,64,0.5)';
+        docuObj.style.textAlign = 'center';
+        docuObj.textContent = 'click and hold to move forward';
+//        document.body.appendChild(docuObj);
+
+        //给lastTime赋值当前时间
+        lastTime = performance.now();
+    }
+
+    function generateTexture() {
+
+        var threeAObj = document.createElement('canvas');
+        threeAObj.width = 32;
+        threeAObj.height = 64;
+        var threeBObj = threeAObj.getContext('2d');
+        threeBObj.fillStyle = '#ffffff';
+        threeBObj.fillRect(0, 0, 32, 64);
+        for (var j = 2; j < 64; j += 2) {
+            for (var _0x5d08x1b = 0; _0x5d08x1b < 32; _0x5d08x1b += 2) {
+                var mathObj = Math.floor(Math.random() * 64);
+                threeBObj.fillStyle = 'rgb(' + [mathObj, mathObj, mathObj].join(',') + ')';
+                threeBObj.fillRect(_0x5d08x1b, j, 2, 1);
+            }
+        }
+
+
+        var docu2Obj = document.createElement('canvas');
+        docu2Obj.width = 512;
+        docu2Obj.height = 1024;
+        var threeBObj = docu2Obj.getContext('2d');
+        threeBObj.imageSmoothingEnabled = false;
+        threeBObj.webkitImageSmoothingEnabled = false;
+        threeBObj.mozImageSmoothingEnabled = false;
+        threeBObj.drawImage(threeAObj, 0, 0, docu2Obj.width, docu2Obj.height);
+        return docu2Obj;
+    }
+
+
+    //运动函数
+    function animate() {
+        requestAnimationFrame(animate);
+        var perforObj = performance.now() / 1000;
+        controls.update(perforObj - lastTime);
+        //渲染
+        renderer.render(scene, camera);
+        //改变lastTime时间
+        lastTime = perforObj;
+    }
+
+</script>
+
+<canvas width="1920" height="705" style="width: 1920px; height: 705px;"></canvas>
+
+<div style="position: absolute; left: 0; top: 15px; width: 100%; color: rgba(0, 0, 64, 0.5); text-align: center;">
+    click and hold to move forward
+</div>
+
+<canvas width="1366" height="637"></canvas>
+
+<div style="position: absolute; left: 0; top: 15px; width: 100%; color: rgba(0, 0, 64, 0.498039); text-align: center;">
+    click and hold to move forward
+</div>
+
+
+</body>
+</html>

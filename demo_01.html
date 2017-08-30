@@ -21,7 +21,7 @@
 <script type="text/javascript" src="js/three.js"></script>
 <script type="text/javascript" src="js/clock.js"></script>
 <script type="text/javascript" src="js/VTKLoader.js"></script>
-<script type="text/javascript" src="js/TrackballControls.js"></script>//鼠标控制缩放
+<script type="text/javascript" src="js/controls/TrackballControls.js"></script>//鼠标控制缩放
 <script>
     function init() {
 
@@ -47,6 +47,7 @@
         controls.dynamicDampingFactor = 0.3;
         controls.keys = [65, 83, 68];
         controls.addEventListener('change', render);
+
         scene.add(camera);
 
         //贴图
