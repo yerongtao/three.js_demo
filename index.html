@@ -1,212 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>多个图形展示</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <script src="js/three.js"></script>
-    <script src="js/OrbitControls.js"></script>
-    <script src="js/stats.min.js"></script>
-
-    <script type="text/javascript">
-        //产生随机颜色
-        var getRandomColor = function(){
-            return '#'+('00000'+(Math.random()*0x1000000<<0).toString(16)).slice(-6);
-        };
-
-        var lesson1 = {
-            scene: null,
-            camera: null,
-            renderer: null,
-            container: null,
-            controls: null,
-            clock: null,
-            stats: null,
-
-            init: function() { // 初始化
-                //定义变量
-                var SCREEN_WIDTH = window.innerWidth - 100,
-                    SCREEN_HEIGHT = window.innerHeight - 100;
-                var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 1, FAR = 10000;
-
-                //渲染器
-                this.renderer = new THREE.WebGLRenderer({antialias:true, alpha: false});
-                this.renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-                this.renderer.setClearColor(0xffffff);
-                this.renderer.shadowMapEnabled = true;
-                this.renderer.shadowMapSoft = true;
-                //场景
-                this.scene = new THREE.Scene();
-                // 照相机
-                this.camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);//--透视投影照相机（Perspective Camera）4个参数
-                this.scene.add(this.camera);
-                this.camera.position.set(-1300, 800, -500);//设置照相机的位置
-                this.camera.lookAt(new THREE.Vector3(0,0,0));//设置照相机往0点方向看
-                //往body添加一个容器div
-                this.container = document.createElement('div');
-                document.body.appendChild(this.container);
-                this.container.appendChild(this.renderer.domElement);
-
-                // 准备控制器 (OrbitControls)
-                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-                this.controls.target = new THREE.Vector3(0, 0, 0);
-                //设置是否鼠标滚动控制缩放
-                this.controls.noZoom = false;//缩放
-                this.controls.zoomSpeed = 2.4;//缩放速度
-                //
-                this.controls.noPan = true;
-                this.controls.panSpeed = 1.6;
-                //
-                this.controls.noRotate = false;
-                this.controls.rotateSpeed = 2.0;
-
-                this.controls.staticMoving = true;
-                this.controls.dynamicDampingFactor = 0.3;
-                this.controls.keys = [65, 83, 68];
-                this.controls.addEventListener('change', render);
-                this.scene.add(this.controls);
-
-
-                /*// 准备计时器
-                this.clock = new THREE.Clock();
-
-                // 准备统计
-                this.stats = new Stats();
-                this.stats.domElement.style.position = 'absolute';
-                this.stats.domElement.style.bottom = '0px';
-                this.stats.domElement.style.zIndex = 10;
-                this.container.appendChild( this.stats.domElement );*/
-
-
-                // 添加定向光线
-                var dLight = new THREE.DirectionalLight(0xffffff);
-                dLight.position.set(1, 1000, 1);
-                dLight.castShadow = true;
-                dLight.shadowCameraVisible = true;
-                dLight.shadowDarkness = 0.2;
-                dLight.shadowMapWidth = dLight.shadowMapHeight = 1000;
-                this.scene.add(dLight);
-
-                // 添加简单的场地
-                var groundGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
-                ground = new THREE.Mesh(groundGeometry,
-                    new THREE.MeshLambertMaterial({
-                    color: 0xdddddd
-                }));
-                ground.position.y = 0;
-                ground.position.x = 200;
-                ground.rotation.x = - Math.PI / 2;
-                this.scene.add(ground);
-
-                // 球体
-                var sphere = new THREE.Mesh(new THREE.SphereGeometry(70, 32, 32),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                sphere.rotation.y = -Math.PI / 2;
-                sphere.position.set(-200, 150, -300);
-                sphere.castShadow = sphere.receiveShadow = true;
-                this.scene.add(sphere);
-
-                // 方块
-                var cube = new THREE.Mesh(new THREE.CubeGeometry(100, 100, 100),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                cube.rotation.x = cube.rotation.z = Math.PI * 0.1;
-                cube.position.set(-200, 150, -100);
-                cube.castShadow = cube.receiveShadow = true;
-                this.scene.add(cube);
-
-                // 圆柱台
-                var cube1 = new THREE.Mesh(new THREE.CylinderGeometry(60, 80, 90, 32),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                cube1.rotation.x = cube1.rotation.z = Math.PI * 0.1;
-                cube1.position.set(-200, 150, 100);
-                cube1.castShadow = cube1.receiveShadow = true;
-                this.scene.add(cube1);
-
-                // 不规则的物体
-                var extrudeSettings = {
-                    amount: 10,
-                    steps: 10,
-                    bevelSegments: 10,
-                    bevelSize: 10,
-                    bevelThickness: 10
-                };
-                var triangleShape = new THREE.Shape();
-                triangleShape.moveTo(  0, -50 );
-                triangleShape.lineTo(  -50, 50 );
-                triangleShape.lineTo( 50, 50 );
-                triangleShape.lineTo(  0, -50 );
-                var extrude = new THREE.Mesh(new THREE.ExtrudeGeometry(triangleShape, extrudeSettings),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                extrude.rotation.y = Math.PI / 2;
-                extrude.position.set(-200, 150, 300);
-                extrude.castShadow = extrude.receiveShadow = true;
-                this.scene.add(extrude);
-
-                // 八面体
-                var octahedron = new THREE.Mesh(new THREE.OctahedronGeometry(80),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                octahedron.position.set(50, 200, -300);
-                octahedron.castShadow = octahedron.receiveShadow = true;
-                this.scene.add(octahedron);
-
-                // 四面体
-                var tetrahedron = new THREE.Mesh(new THREE.TetrahedronGeometry(80),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                tetrahedron.position.set(50, 200, -100);
-                tetrahedron.castShadow = tetrahedron.receiveShadow = true;
-                this.scene.add(tetrahedron);
-
-                // 圆环
-                var torus = new THREE.Mesh(new THREE.TorusGeometry(60, 20, 16, 100),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                torus.rotation.y = -Math.PI / 2;
-                torus.position.set(50, 200, 100);
-                torus.castShadow = torus.receiveShadow = true;
-                this.scene.add(torus);
-
-                // 圆环管
-                var torusK = new THREE.Mesh(new THREE.TorusKnotGeometry(60, 20, 16, 100),
-                    new THREE.MeshLambertMaterial({ color: getRandomColor() }));
-                torusK.rotation.y = -Math.PI / 2;
-                torusK.position.set(50, 200, 300);
-                torusK.castShadow = torusK.receiveShadow = true;
-                this.scene.add(torusK);
-            }
-
-        };
-
-        // 使场景动画化
-        function animate() {
-            requestAnimationFrame(animate);
-            lesson1.controls.update();
-        }
-
-        // 渲染场景
-        function render() {
-            if (lesson1.renderer) {
-                lesson1.renderer.render(lesson1.scene, lesson1.camera);
-            }
-        }
-
-        // 在页面加载时初始化 lesson 对象
-        function initializeLesson() {
-            lesson1.init();
-            render();
-            animate();
-        }
-
-        if (window.addEventListener)
-            window.addEventListener('load', initializeLesson, false);
-        else if (window.attachEvent)
-            window.attachEvent('onload', initializeLesson);
-        else window.onload = initializeLesson;
-
-    </script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<title>室内效果</title>
+	<style>
+		body {
+			background-color: rgb(200,200,200);
+			margin: 0px;
+			overflow: hidden;
+		}
+		a {
+			color: #ffffff;
+		}
+	</style>
 </head>
 <body>
 
+<div id="container" style="width: 800px;height: 600px">
+
+</div>
+
+<script src="js/three.js"></script>
+<script src="js/controls/FirstPersonControls.js"></script>
+
+<script>
+
+    var camera, scene, renderer;
+
+    var moveForward = false;
+    var moveBackward = false;
+    var moveLeft = false;
+    var moveRight = false;
+    var activeLook = true;
+
+    var texture_placeholder,
+        isUserInteracting = false,//用户交互，初始为false
+        onMouseDownMouseX = 0,
+		onMouseDownMouseY = 0,
+
+        lon = 90, onMouseDownLon = 0,
+        lat = 0, onMouseDownLat = 0,
+        phi = 0,
+        theta = 0,
+        target = new THREE.Vector3();
+
+    init();
+    animate();
+
+    function init() {
+
+        var container, mesh;
+
+        container = document.getElementById( 'container' );
+        //照相机
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
+        //场景
+        scene = new THREE.Scene();
 
 
+        var materials = [
+            loadTexture( 'img/room/13.jpg' ),
+            loadTexture( 'img/room/11.jpg' ),
+            loadTexture( 'img/room/16.jpg' ),
+            loadTexture( 'img/room/15.jpg' ),
+            loadTexture( 'img/room/12.jpg' ),
+            loadTexture( 'img/room/14.jpg' )
+        ];
+        //实体
+        //BoxGeometry用来在三维空间内创建一个立方体盒子对象.
+        mesh = new THREE.Mesh( new THREE.BoxGeometry( 300, 300, 300, 1, 1, 1 ), materials);
+        mesh.scale.x =  -1;
+        scene.add( mesh );
+        //渲染器
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        //renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( 1500, 800 );
+        container.appendChild( renderer.domElement );
+
+
+        //addEventListener()用于向指定元素添加事件句柄
+        document.addEventListener( 'mousedown', onMouseDown, false );
+        document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+        document.addEventListener( 'mouseup', onMouseUp, false );
+        //鼠标滚轮控制缩放
+        document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+
+        document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+        document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+        //
+        window.addEventListener( 'resize', onWindowResize, false );
+
+    }
+
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+    }
+
+    function loadTexture( path ) {
+
+        var texture = new THREE.Texture( texture_placeholder );
+        var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
+
+        var image = new Image();
+        image.onload = function () {
+
+            texture.image = this;
+            texture.needsUpdate = true;
+
+        };
+        image.src = path;
+
+        return material;
+
+    }
+
+    //鼠标点击时触发的函数
+    function onDocumentMouseDown( event ) {
+
+        event.preventDefault();
+
+        isUserInteracting = true;
+
+        //
+        onPointerDownPointerX = event.clientX;//触摸目标在视口中的x坐标
+        onPointerDownPointerY = event.clientY;//触摸目标在视口中的y坐标
+
+        onPointerDownLon = lon;
+        onPointerDownLat = lat;
+
+    }
+
+    //鼠标移开时触发的函数
+    function onDocumentMouseMove( event ) {
+
+        if ( isUserInteracting === true ) {
+
+            lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
+            lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+
+        }
+
+    }
+
+    //鼠标点击弹起后时触发的函数
+    function onDocumentMouseUp( event ) {
+
+        isUserInteracting = false;
+
+    }
+
+    //鼠标滚轮滚动时，控制缩放
+    function onDocumentMouseWheel( event ) {
+        //控制缩放其实是改变照相机位置，照相机离得远了，物体就变小了
+        camera.fov += event.deltaY * 0.05;
+        camera.updateProjectionMatrix();
+
+    }
+
+
+    function onDocumentTouchStart( event ) {
+
+        if ( event.touches.length == 1 ) {
+
+            event.preventDefault();
+
+            onPointerDownPointerX = event.touches[ 0 ].pageX;
+            onPointerDownPointerY = event.touches[ 0 ].pageY;
+
+            onPointerDownLon = lon;
+            onPointerDownLat = lat;
+
+        }
+
+    }
+
+    function onDocumentTouchMove( event ) {
+
+        if ( event.touches.length == 1 ) {
+
+            event.preventDefault();
+
+            lon = ( onPointerDownPointerX - event.touches[0].pageX ) * 0.1 + onPointerDownLon;
+            lat = ( event.touches[0].pageY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+
+        }
+
+    }
+
+    //鼠标点击执行函数
+    function onMouseDown ( event ) {
+
+        event.preventDefault();//通知浏览器不要执行与事件关联的默认动作
+        event.stopPropagation();//不再派发事件
+
+        if ( activeLook ) {
+            switch ( event.button ) {//event.button返回当前事件点击的鼠标按键
+                case 0: //鼠标左键，前进
+                    moveForward = true; break;
+                case 2: //鼠标右键，后退
+                    moveBackward = true; break;
+            }
+        }
+    }
+
+    //鼠标点击后弹起执行函数
+    function onMouseUp ( event ) {
+
+        event.preventDefault();//通知浏览器不要执行与事件关联的默认动作
+        event.stopPropagation();//不再派发事件
+
+        if ( activeLook ) {
+
+            switch ( event.button ) {
+
+                case 0: //鼠标左键，停止前进
+                    moveForward = false; break;
+                case 2: //鼠标右键，停止后退
+                    moveBackward = false; break;
+            }
+        }
+
+    }
+
+
+    function animate() {
+        requestAnimationFrame( animate );//递归调用
+        update();
+
+    }
+
+    function update() {
+
+        if ( moveForward ) {
+            scene.translateZ( - 1 );//定义3D转换
+		}
+
+
+        //当用户无交互时，设置角度自增变化
+        if ( isUserInteracting === false ) {
+            //lon初始值为90，每次递增0.1，角度值变换
+            lon += 0.1;
+        }
+
+        //角度值计算
+        lat = Math.max( - 85, Math.min( 85, lat ) );
+        phi = THREE.Math.degToRad( 90 - lat );
+        theta = THREE.Math.degToRad( lon );
+
+        //设置移动算法
+        target.x = 500 * Math.sin( phi ) * Math.cos( theta );
+        target.y = 500 * Math.cos( phi );
+        target.z = 500 * Math.sin( phi ) * Math.sin( theta );
+
+        //设置照相机看向target方向
+        camera.lookAt( target );
+        //渲染
+        renderer.render( scene, camera );
+
+    }
+
+</script>
 </body>
 </html>
