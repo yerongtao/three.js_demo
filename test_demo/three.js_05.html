@@ -11,6 +11,7 @@
         var renderer = null;
         var mesh = null;
         var id = null;
+        var materialsMaps = [];
         function init() {
             //渲染器（Renderer）
             renderer = new THREE.WebGLRenderer();
@@ -28,11 +29,24 @@
             var light = new THREE.DirectionalLight(0xffffff);
             light.position.set(15, 10, 5);
             scene.add(light);
+
+
+            //创建多贴图材质
+//            var materialsMaps = [];
+            for (var i = 1; i < 7; ++i) {
+                materialsMaps.push(new THREE.MeshBasicMaterial({
+                    map: THREE.ImageUtils.loadTexture('../img/' + i + '.jpg',
+                        {}, function() {
+                            renderer.render(scene, camera);
+                        }),
+                    overdraw: true
+                }));
+            }
+
+
             //实体
             mesh = new THREE.Mesh(new THREE.CubeGeometry(1, 2, 3),
-                new THREE.MeshLambertMaterial({
-                    color: 0xffff00
-                }));
+                new THREE.MeshFaceMaterial(materialsMaps));
             scene.add(mesh);
 
             id = setInterval(draw, 20);

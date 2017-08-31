@@ -51,6 +51,7 @@
             var materialMap = new THREE.MeshLambertMaterial({
                 map: texture//材质的map属性设置为texture
             });
+
             //创建多贴图材质
             var materialsMaps = [];
             for (var i = 1; i < 7; ++i) {
@@ -62,6 +63,7 @@
                     overdraw: true
                 }));
             }
+
             //一个黑白格
             var textureChess = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
                 renderer.render(scene, camera);//重绘函数

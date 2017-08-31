@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>跟踪鼠标，作为第一人称控制</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+			}
+
+			body {
+				background-color: #ffffff;
+				margin: 0;
+				overflow: hidden;
+				font-family: arial;
+			}
+
+			#blocker {
+
+				position: absolute;
+
+				width: 100%;
+				height: 100%;
+
+				background-color: rgba(0,0,0,0.5);
+
+			}
+
+			#instructions {
+
+				width: 100%;
+				height: 100%;
+
+				display: -webkit-box;
+				display: -moz-box;
+				display: box;
+
+				-webkit-box-orient: horizontal;
+				-moz-box-orient: horizontal;
+				box-orient: horizontal;
+
+				-webkit-box-pack: center;
+				-moz-box-pack: center;
+				box-pack: center;
+
+				-webkit-box-align: center;
+				-moz-box-align: center;
+				box-align: center;
+
+				color: #ffffff;
+				text-align: center;
+
+				cursor: pointer;
+
+			}
+
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script src="js/controls/PointerLockControls.js"></script>
+
+		<div id="blocker">
+
+			<div id="instructions">
+				<span style="font-size:40px">通过点击鼠标进入全景预览</span><br /><br />
+				上 下 左 右 表示  前进  后退  向左  向右<br /><br />
+				鼠标移动左右转动视野<br />
+			</div>
+
+		</div>
+
+		<script>
+
+            var _zoomStart = new THREE.Vector2();
+            var _zoomEnd = new THREE.Vector2();
+
+
+
+			var camera, scene, renderer;
+			var geometry, material, mesh;
+			var controls;
+
+			var objects = [];
+
+			var raycaster;
+
+            var controlsEnabled = false;
+
+            var moveForward = false;
+            var moveBackward = false;
+            var moveLeft = false;
+            var moveRight = false;
+            var canJump = false;
+
+            var texture;
+            var texture1;
+            var texture2;
+            var texture3;
+
+            var cube16;
+
+            // events
+
+            var changeEvent = { type: 'change' };
+            var startEvent = { type: 'start' };
+            var endEvent = { type: 'end' };
+
+            var prevTime = performance.now();
+            var velocity = new THREE.Vector3();
+
+
+			var blocker = document.getElementById( 'blocker' );
+			var instructions = document.getElementById( 'instructions' );
+
+			var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+
+			if ( havePointerLock ) {
+
+				var element = document.body;
+
+				var pointerlockchange = function ( event ) {
+
+					if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+
+						controlsEnabled = true;
+						controls.enabled = true;
+
+						blocker.style.display = 'none';
+
+					} else {
+
+						controls.enabled = false;
+
+						blocker.style.display = '-webkit-box';
+						blocker.style.display = '-moz-box';
+						blocker.style.display = 'box';
+
+						instructions.style.display = '';
+
+					}
+
+				};
+
+				var pointerlockerror = function ( event ) {
+
+					instructions.style.display = '';
+
+				};
+
+				// Hook pointer lock state change events
+				document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+				document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+				document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+
+				document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+				document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+				document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+
+				instructions.addEventListener( 'click', function ( event ) {
+
+					instructions.style.display = 'none';
+
+					// Ask the browser to lock the pointer
+					element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+					element.requestPointerLock();
+
+				}, false );
+
+			} else {
+
+				instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+
+			}
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+//                camera.position.set(0, 3, 0);
+                camera.position.set(30, 6, 50);
+//                camera.lookAt(new THREE.Vector3(50,20,50));
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
+
+				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+				light.position.set( 0.5, 1, 0.75 );
+				scene.add( light );
+
+				controls = new THREE.PointerLockControls( camera );
+				scene.add( controls.getObject() );
+
+  /*              this.rotateCamera = ( function() {
+
+                    var axis = new THREE.Vector3(),
+                        quaternion = new THREE.Quaternion(),
+                        eyeDirection = new THREE.Vector3(),
+                        objectUpDirection = new THREE.Vector3(),
+                        objectSidewaysDirection = new THREE.Vector3(),
+                        moveDirection = new THREE.Vector3(),
+                        angle;
+
+                    return function rotateCamera() {
+
+                        moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
+                        angle = moveDirection.length();
+
+                        if ( angle ) {
+
+                            _eye.copy( _this.object.position ).sub( _this.target );
+
+                            eyeDirection.copy( _eye ).normalize();
+                            objectUpDirection.copy( _this.object.up ).normalize();
+                            objectSidewaysDirection.crossVectors( objectUpDirection, eyeDirection ).normalize();
+
+                            objectUpDirection.setLength( _moveCurr.y - _movePrev.y );
+                            objectSidewaysDirection.setLength( _moveCurr.x - _movePrev.x );
+
+                            moveDirection.copy( objectUpDirection.add( objectSidewaysDirection ) );
+
+                            axis.crossVectors( moveDirection, _eye ).normalize();
+
+                            angle *= _this.rotateSpeed;
+                            quaternion.setFromAxisAngle( axis, angle );
+
+                            _eye.applyQuaternion( quaternion );
+                            _this.object.up.applyQuaternion( quaternion );
+
+                            _lastAxis.copy( axis );
+                            _lastAngle = angle;
+
+                        } else if ( ! _this.staticMoving && _lastAngle ) {
+
+                            _lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
+                            _eye.copy( _this.object.position ).sub( _this.target );
+                            quaternion.setFromAxisAngle( _lastAxis, _lastAngle );
+                            _eye.applyQuaternion( quaternion );
+                            _this.object.up.applyQuaternion( quaternion );
+
+                        }
+
+                        _movePrev.copy( _moveCurr );
+
+                    };
+
+                }() );
+
+                this.zoomCamera = function () {
+
+                    if ( _state === STATE.TOUCH_ZOOM ) {
+
+                        var factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
+                        _touchZoomDistanceStart = _touchZoomDistanceEnd;
+                        _eye.multiplyScalar( factor );
+
+                    } else {
+
+                        var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
+
+                        if ( factor !== 1.0 && factor > 0.0 ) {
+
+                            _eye.multiplyScalar( factor );
+
+                            if ( _this.staticMoving ) {
+
+                                _zoomStart.copy( _zoomEnd );
+
+                            } else {
+
+                                _zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
+
+                            }
+
+                        }
+
+                    }
+
+                };
+
+                this.panCamera = function () {
+
+                    var mouseChange = _panEnd.clone().sub( _panStart );
+
+                    if ( mouseChange.lengthSq() ) {
+
+                        mouseChange.multiplyScalar( _eye.length() * _this.panSpeed );
+
+                        var pan = _eye.clone().cross( _this.object.up ).setLength( mouseChange.x );
+                        pan.add( _this.object.up.clone().setLength( mouseChange.y ) );
+
+                        _this.object.position.add( pan );
+                        _this.target.add( pan );
+
+                        if ( _this.staticMoving ) {
+
+                            _panStart = _panEnd;
+
+                        } else {
+
+                            _panStart.add( mouseChange.subVectors( _panEnd, _panStart ).multiplyScalar( _this.dynamicDampingFactor ) );
+
+                        }
+
+                    }
+
+                };*/
+
+
+				var onKeyDown = function ( event ) {
+
+					switch ( event.keyCode ) {
+
+						case 38: // up
+						case 87: // w
+							moveForward = true;
+							break;
+
+						case 37: // left
+						case 65: // a
+							moveLeft = true; break;
+
+						case 40: // down
+						case 83: // s
+							moveBackward = true;
+							break;
+
+						case 39: // right
+						case 68: // d
+							moveRight = true;
+							break;
+
+						case 32: // space
+							if ( canJump === true ) velocity.y += 350;
+							canJump = false;
+							break;
+
+					}
+
+				};
+
+				var onKeyUp = function ( event ) {
+
+					switch( event.keyCode ) {
+
+						case 38: // up
+						case 87: // w
+							moveForward = false;
+							break;
+
+						case 37: // left
+						case 65: // a
+							moveLeft = false;
+							break;
+
+						case 40: // down
+						case 83: // s
+							moveBackward = false;
+							break;
+
+						case 39: // right
+						case 68: // d
+							moveRight = false;
+							break;
+
+					}
+
+				};
+
+                var mousewheel = function( event ) {
+
+                    if ( this.enabled === false ) return;
+
+                    console.log('a123');
+
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    //鼠标滚轮事件
+                    switch ( event.button ) {
+                        //deltaX:返回一个数值,表示滚轮的水平滚动量
+                        //deltaY:返回一个数值,表示滚轮的垂直滚动量
+                        //deltaZ:返回一个数值,表示滚轮的Z轴滚动量
+                        case 2:
+                            // Zoom in pages
+                            _zoomStart.y -= event.deltaY * 0.025;
+                            console.log(event.button );
+                            console.log('aaa');
+                            break;
+
+                        case 1:
+                            // Zoom in lines
+                            _zoomStart.y -= event.deltaY * 0.01;
+                            console.log(event.button );
+                            console.log('bbb');
+                            break;
+
+                        default:
+                            // undefined, 0, assume pixels
+                            _zoomStart.y -= event.deltaY * 0.00025;
+                            console.log(event.button );
+                            console.log('ccc');
+                            break;
+
+                    }
+
+                 /*   this.dispatchEvent( startEvent );
+                    this.dispatchEvent( endEvent );*/
+
+                };
+
+
+
+
+
+				document.addEventListener( 'keydown', onKeyDown, false );
+				document.addEventListener( 'keyup', onKeyUp, false );
+
+                document.addEventListener( 'mousewheel', mousewheel, false );
+                document.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+
+				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+
+				// objects
+
+                //贴图
+                texture = THREE.ImageUtils.loadTexture('img/crate.gif', {}, function() {
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set(4, 4);
+                    renderer.render(scene, camera);
+                });
+                //贴图
+                texture1 = THREE.ImageUtils.loadTexture('img/tietu.jpg', {}, function() {
+                    texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
+                    texture1.repeat.set(4, 4);
+                    renderer.render(scene, camera);
+                });
+                //贴图
+                texture2 = THREE.ImageUtils.loadTexture('img/chess.png', {}, function() {
+                    texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
+                    texture2.repeat.set(4, 4);
+                    renderer.render(scene, camera);
+                });
+                //贴图
+                texture3 = THREE.ImageUtils.loadTexture('img/1.jpg', {}, function() {
+                    texture3.wrapS = texture3.wrapT = THREE.RepeatWrapping;
+                    renderer.render(scene, camera);
+                });
+
+
+
+
+                //墙体模型
+                car2(scene);
+                //平面
+                var planes = [];
+                for(var j=0;j<3;j++){
+                    var plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
+                        new THREE.MeshLambertMaterial({color: 0xefefef,map: texture1}));
+                    planes.push(plane);
+                    planes[j].receiveShadow = true;
+                }
+                planes[0].rotation.x = -Math.PI / 2;
+                planes[0].position.y = -1;
+                planes[1].rotation.y = 0;
+
+                planes[1].position.set(-5,5,0);
+                planes[2].position.set(0,5,-5);
+                scene.add(planes[0]);
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+                //浏览器窗口改变大小时事件
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+			    //设置旋转
+                cube16.rotation.y = (cube16.rotation.y + 0.015) % (Math.PI * 2);
+
+
+				requestAnimationFrame( animate );
+
+				if ( controlsEnabled ) {
+					raycaster.ray.origin.copy( controls.getObject().position );
+					raycaster.ray.origin.y -= 10;
+
+					var intersections = raycaster.intersectObjects( objects );
+
+					var isOnObject = intersections.length > 0;
+
+					var time = performance.now();
+					var delta = ( time - prevTime ) / 1000;
+
+					velocity.x -= velocity.x * 10.0 * delta;
+					velocity.z -= velocity.z * 10.0 * delta;
+
+					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+					if ( moveForward ) velocity.z -= 400.0 * delta;
+					if ( moveBackward ) velocity.z += 400.0 * delta;
+
+					if ( moveLeft ) velocity.x -= 400.0 * delta;
+					if ( moveRight ) velocity.x += 400.0 * delta;
+
+					if ( isOnObject === true ) {
+						velocity.y = Math.max( 0, velocity.y );
+
+						canJump = true;
+					}
+
+					controls.getObject().translateX( velocity.x * delta );
+					controls.getObject().translateY( velocity.y * delta );
+					controls.getObject().translateZ( velocity.z * delta );
+
+					if ( controls.getObject().position.y < 10 ) {
+
+						velocity.y = 0;
+						controls.getObject().position.y = 10;
+
+						canJump = true;
+
+					}
+
+					prevTime = time;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+
+            //墙体模型
+            function car2(scene) {
+                var cube = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 122.50),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube.position.set(-32.70, 5, 0);
+                cube.castShadow = true;
+                scene.add(cube);
+
+                var cube1 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 56.30),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube1.position.set(37.80, 5, 34.1);
+                cube1.castShadow = true;
+                scene.add(cube1);
+
+                var cube2 = new THREE.Mesh(new THREE.CubeGeometry(10.70, 10, 2),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube2.position.set(43.15, 5, 5.05);
+                cube2.castShadow = true;
+                scene.add(cube2);
+
+                var cube3 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 55.80),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube3.position.set(48.50, 5, -33.95);
+                cube3.castShadow = true;
+                scene.add(cube3);
+
+                var cube4 = new THREE.Mesh(new THREE.CubeGeometry(70.10, 10, 2),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube4.position.set(2.35, 5, 61.25);
+                cube4.castShadow = true;
+                scene.add(cube4);
+
+                var cube5 = new THREE.Mesh(new THREE.CubeGeometry(80.80, 10, 2),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube5.position.set(7.70, 5, -61.25);
+                cube5.castShadow = true;
+                scene.add(cube5);
+
+                var cube6 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube6.position.set(0, 5, 35);
+                cube6.castShadow = true;
+                scene.add(cube6);
+
+                var cube7 = new THREE.Mesh(new THREE.CubeGeometry(20.60, 10, 2),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube7.position.set(19.30, 5, -7.50);
+                cube7.castShadow = true;
+                scene.add(cube7);
+
+                var cube8 = new THREE.Mesh(new THREE.CubeGeometry(30.60, 10, 2),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube8.position.set(-16.50, 5, 0);
+                cube8.castShadow = true;
+                scene.add(cube8);
+
+                var cube9 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube9.position.set(0, 5, -35);
+                cube9.castShadow = true;
+                scene.add(cube9);
+
+                var cube10 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.80),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube10.position.set(30.6, 5, -33.80);
+                cube10.castShadow = true;
+                scene.add(cube10);
+
+                var cube11 = new THREE.Mesh(new THREE.CubeGeometry(8.60, 10, 2),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
+                cube11.position.set(43.30, 5, -7.00);
+                cube11.castShadow = true;
+                scene.add(cube11);
+
+                var cube12 = new THREE.Mesh(new THREE.CubeGeometry(8, 3, 18),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+                cube12.position.set(10.00, 1, 40.00);
+                cube12.castShadow = true;
+                scene.add(cube12);
+
+                var cube13 = new THREE.Mesh(new THREE.CubeGeometry(10, 3, 10),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+                cube13.position.set(-15.00, 1, 40.00);
+                cube13.castShadow = true;
+                scene.add(cube13);
+
+                var cube14 = new THREE.Mesh(new THREE.CubeGeometry(15, 3, 10),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+                cube14.position.set(-15.00, 1, -45.00);
+                cube14.castShadow = true;
+                scene.add(cube14);
+
+                var cube15 = new THREE.Mesh(new THREE.CubeGeometry(10, 3, 10),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+                cube15.position.set(15.00, 1, -25.00);
+                cube15.castShadow = true;
+                scene.add(cube15);
+
+                cube16 = new THREE.Mesh(new THREE.CubeGeometry(3, 3, 3),
+                    new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture3}));
+                cube16.position.set(10.00, 4, 40.00);
+                cube16.castShadow = true;
+                scene.add(cube16);
+
+            }
+
+		</script>
+	</body>
+</html>
