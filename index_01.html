@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - pointerlock controls</title>
+		<title>跟踪鼠标，作为第一人称控制</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -65,14 +65,16 @@
 		<div id="blocker">
 
 			<div id="instructions">
-				<span style="font-size:40px">Click to play</span>
-				<br />
-				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+				<span style="font-size:40px">通过点击鼠标进入全景预览</span><br /><br />
+				上 下 左 右 表示  前进  后退  向左  向右<br /><br />
+				鼠标移动左右转动视野<br />
 			</div>
 
 		</div>
 
 		<script>
+
+            var _zoomStart = new THREE.Vector2();
 
 			var camera, scene, renderer;
 			var geometry, material, mesh;
@@ -82,28 +84,6 @@
 
 			var raycaster;
 
-            var controlsEnabled = false;
-            var moveForward = false;
-            var moveBackward = false;
-            var moveLeft = false;
-            var moveRight = false;
-            var canJump = false;
-
-            var mouseDragOn = false;
-
-            var mouseX = 0;
-            var mouseY = 0;
-            var viewHalfX = 0;
-            var viewHalfY = 0;
-            var constrainVertical = false;
-            var verticalMin = 0;
-            var verticalMax = Math.PI;
-            var activeLook = true;
-
-
-
-            var prevTime = performance.now();
-            var velocity = new THREE.Vector3();
 
 			var blocker = document.getElementById( 'blocker' );
 			var instructions = document.getElementById( 'instructions' );
@@ -115,7 +95,6 @@
 				var element = document.body;
 
 				var pointerlockchange = function ( event ) {
-				    controls.log('pointerlockchange');
 
 					if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
 
@@ -169,17 +148,26 @@
 
 			}
 
+			init();
+			animate();
 
+			var controlsEnabled = false;
 
-            init();
-            animate();
+			var moveForward = false;
+			var moveBackward = false;
+			var moveLeft = false;
+			var moveRight = false;
+			var canJump = false;
+
+			var prevTime = performance.now();
+			var velocity = new THREE.Vector3();
 
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-//                camera.position.set(100, 80, 0);
-                camera.lookAt(new THREE.Vector3(0,0,0));
-
+//                camera.position.set(0, 3, 0);
+                camera.position.set(30, 6, 50);
+//                camera.lookAt(new THREE.Vector3(50,20,50));
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
@@ -189,13 +177,70 @@
 				light.position.set( 0.5, 1, 0.75 );
 				scene.add( light );
 
-
-				//鼠标指针锁定控制器
 				controls = new THREE.PointerLockControls( camera );
-
-                controls.movementSpeed = 20;//鼠标步进
-
 				scene.add( controls.getObject() );
+
+
+                this.zoomCamera = function () {
+
+                    if ( _state === STATE.TOUCH_ZOOM ) {
+
+                        var factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
+                        _touchZoomDistanceStart = _touchZoomDistanceEnd;
+                        _eye.multiplyScalar( factor );
+
+                    } else {
+
+                        var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
+
+                        if ( factor !== 1.0 && factor > 0.0 ) {
+
+                            _eye.multiplyScalar( factor );
+
+                            if ( _this.staticMoving ) {
+
+                                _zoomStart.copy( _zoomEnd );
+
+                            } else {
+
+                                _zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
+
+                            }
+
+                        }
+
+                    }
+
+                };
+
+                this.panCamera = function () {
+
+                    var mouseChange = _panEnd.clone().sub( _panStart );
+
+                    if ( mouseChange.lengthSq() ) {
+
+                        mouseChange.multiplyScalar( _eye.length() * _this.panSpeed );
+
+                        var pan = _eye.clone().cross( _this.object.up ).setLength( mouseChange.x );
+                        pan.add( _this.object.up.clone().setLength( mouseChange.y ) );
+
+                        _this.object.position.add( pan );
+                        _this.target.add( pan );
+
+                        if ( _this.staticMoving ) {
+
+                            _panStart = _panEnd;
+
+                        } else {
+
+                            _panStart.add( mouseChange.subVectors( _panEnd, _panStart ).multiplyScalar( _this.dynamicDampingFactor ) );
+
+                        }
+
+                    }
+
+                };
+
 
 				var onKeyDown = function ( event ) {
 
@@ -257,85 +302,40 @@
 
 				};
 
-                var onMouseMove = function ( event ) {
+                var mousewheel = function( event ) {
 
-                    if ( domElement === document ) {
+                    /*controls.log(controls.enabled);
 
-                        mouseX = event.pageX - viewHalfX;
-                        mouseY = event.pageY - viewHalfY;
-
-                    } else {
-
-                        mouseX = event.pageX - domElement.offsetLeft - viewHalfX;
-                        mouseY = event.pageY - domElement.offsetTop - viewHalfY;
-
-                    }
-
-                };
-
-                var onMouseDown = function ( event ) {
-
-                    if ( domElement !== document ) {
-
-                        domElement.focus();
-
-                    }
+                    if ( controls.enabled === false ) return;*/
 
                     event.preventDefault();
                     event.stopPropagation();
 
-                    if ( activeLook ) {
+                    var delta = 0;
 
-                        switch ( event.button ) {
+                    if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
 
-                            case 0: moveForward = true; break;
-                            case 2: moveBackward = true; break;
+                        delta = event.wheelDelta / 40;
 
-                        }
+                    } else if ( event.detail ) { // Firefox
+
+                        delta = - event.detail / 3;
 
                     }
 
-                    mouseDragOn = true;
+                    _zoomStart.y += ( 1 / delta ) * 0.05;
 
-                };
-
-                var onMouseUp = function ( event ) {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    if (activeLook) {
-
-                        switch (event.button) {
-
-                            case 0:
-                                moveForward = false;
-                                break;
-                            case 2:
-                                moveBackward = false;
-                                break;
-                        }
-                    }
-                    mouseDragOn = false;
                 };
 
 
 
-				//键盘事件
+
+
 				document.addEventListener( 'keydown', onKeyDown, false );
 				document.addEventListener( 'keyup', onKeyUp, false );
 
-				//鼠标事件
-                document.addEventListener( 'mousemove', onMouseMove , false );
-                document.addEventListener( 'mousedown', onMouseDown, false );
-                document.addEventListener( 'mouseup', onMouseUp, false );
-
-
-
-
-
-
-
-
+                document.addEventListener( 'mousewheel', mousewheel, false );
+                document.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
 
 				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
@@ -374,9 +374,7 @@
                 scene.add(planes[0]);
 
 
-
-
-
+				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -453,79 +451,78 @@
 
             //墙体模型
             function car2(scene, texture) {
-                var cube = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 122.50, 10, 5, 5),
+                var cube = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 122.50),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube.position.set(-32.70, 5, 0);
                 cube.castShadow = true;
                 scene.add(cube);
 
-                var cube1 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 56.30, 10, 5, 5),
+                var cube1 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 56.30),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube1.position.set(37.80, 5, 34.1);
                 cube1.castShadow = true;
                 scene.add(cube1);
 
-                var cube2 = new THREE.Mesh(new THREE.CubeGeometry(10.70, 10, 2, 10, 5, 5),
+                var cube2 = new THREE.Mesh(new THREE.CubeGeometry(10.70, 10, 2),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube2.position.set(43.15, 5, 5.05);
                 cube2.castShadow = true;
                 scene.add(cube2);
 
-                var cube3 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 55.80, 10, 5, 5),
+                var cube3 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 55.80),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube3.position.set(48.50, 5, -33.95);
                 cube3.castShadow = true;
                 scene.add(cube3);
 
-                var cube4 = new THREE.Mesh(new THREE.CubeGeometry(70.10, 10, 2, 10, 5, 5),
+                var cube4 = new THREE.Mesh(new THREE.CubeGeometry(70.10, 10, 2),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube4.position.set(2.35, 5, 61.25);
                 cube4.castShadow = true;
                 scene.add(cube4);
 
-                var cube5 = new THREE.Mesh(new THREE.CubeGeometry(80.80, 10, 2, 10, 5, 5),
+                var cube5 = new THREE.Mesh(new THREE.CubeGeometry(80.80, 10, 2),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube5.position.set(7.70, 5, -61.25);
                 cube5.castShadow = true;
                 scene.add(cube5);
 
-                var cube6 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50, 10, 5, 5),
+                var cube6 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube6.position.set(0, 5, 35);
                 cube6.castShadow = true;
                 scene.add(cube6);
 
-                var cube7 = new THREE.Mesh(new THREE.CubeGeometry(20.60, 10, 2, 10, 5, 5),
+                var cube7 = new THREE.Mesh(new THREE.CubeGeometry(20.60, 10, 2),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube7.position.set(19.30, 5, -7.50);
                 cube7.castShadow = true;
                 scene.add(cube7);
 
-                var cube8 = new THREE.Mesh(new THREE.CubeGeometry(30.60, 10, 2, 10, 5, 5),
+                var cube8 = new THREE.Mesh(new THREE.CubeGeometry(30.60, 10, 2),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube8.position.set(-16.50, 5, 0);
                 cube8.castShadow = true;
                 scene.add(cube8);
 
-                var cube9 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50, 10, 5, 5),
+                var cube9 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube9.position.set(0, 5, -35);
                 cube9.castShadow = true;
                 scene.add(cube9);
 
-                var cube10 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.80, 10, 5, 5),
+                var cube10 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.80),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube10.position.set(30.6, 5, -33.80);
                 cube10.castShadow = true;
                 scene.add(cube10);
 
-                var cube11 = new THREE.Mesh(new THREE.CubeGeometry(8.60, 10, 2, 10, 5, 5),
+                var cube11 = new THREE.Mesh(new THREE.CubeGeometry(8.60, 10, 2),
                     new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
                 cube11.position.set(43.30, 5, -7.00);
                 cube11.castShadow = true;
                 scene.add(cube11);
             }
-
 
 		</script>
 	</body>

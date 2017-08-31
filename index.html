@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<title>室内效果</title>
+	<title>室内效果预览，鼠标控制前进后退和拉伸</title>
 	<style>
 		body {
 			background-color: rgb(200,200,200);
@@ -22,7 +22,8 @@
 </div>
 
 <script src="js/three.js"></script>
-<script src="js/controls/FirstPersonControls.js"></script>
+<!--第一人称控制器-->
+<!--<script src="js/controls/FirstPersonControls.js"></script>-->
 
 <script>
 
@@ -87,6 +88,7 @@
         //鼠标滚轮控制缩放
         document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
+        //
         document.addEventListener( 'touchstart', onDocumentTouchStart, false );
         document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
@@ -234,7 +236,6 @@
     function animate() {
         requestAnimationFrame( animate );//递归调用
         update();
-
     }
 
     function update() {
@@ -242,6 +243,9 @@
         if ( moveForward ) {
             scene.translateZ( - 1 );//定义3D转换
 		}
+        if ( moveBackward ) {
+            scene.translateZ(  1 );//定义3D转换
+        }
 
 
         //当用户无交互时，设置角度自增变化
@@ -262,9 +266,9 @@
 
         //设置照相机看向target方向
         camera.lookAt( target );
+
         //渲染
         renderer.render( scene, camera );
-
     }
 
 </script>

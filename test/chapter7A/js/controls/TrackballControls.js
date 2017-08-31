@@ -35,7 +35,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
-	// internals
+	// internals  内部
 
 	this.target = new THREE.Vector3();
 
@@ -58,18 +58,18 @@ THREE.TrackballControls = function ( object, domElement ) {
 	_panStart = new THREE.Vector2(),
 	_panEnd = new THREE.Vector2();
 
-	// for reset
+	// for reset  重置
 
 	this.target0 = this.target.clone();
 	this.position0 = this.object.position.clone();
 	this.up0 = this.object.up.clone();
 
-	// events
+	// events  事件
 
 	var changeEvent = { type: 'change' };
 
 
-	// methods
+	// methods  方法
 
 	this.handleResize = function () {
 
@@ -283,6 +283,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
+	//重置
 	this.reset = function () {
 
 		_state = STATE.NONE;
@@ -302,7 +303,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
-	// listeners
+
+	// listeners  监听
 
 	function keydown( event ) {
 
@@ -517,6 +519,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_state = STATE.NONE;
 
 	}
+
+	//调用
 
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 
