@@ -1,0 +1,70 @@
+@charset 'UTF-8';
+
+* {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+#message {
+    position: absolute;
+    top: 4px;
+    left: 100px;
+    width: 530px;
+    height: 20px;
+    background-color: #fff;
+    text-align: center;
+}
+
+#progress-wrap {
+    position: absolute;
+    top: 28px;
+    left: 100px;
+    width: 200px;
+    height: 20px;
+    background-color: #fff;
+    text-align: center;
+}
+
+#progress-info {
+    position: absolute;
+    width: 100%;
+    font: 700 14px/20px "Microsoft YaHei", sans-serif;
+}
+
+#progress {
+    margin-left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: #0f0;
+}
+
+.info {
+    position: absolute;
+    top: 0;
+    right: 50px;
+    text-align: center;
+}
+
+.key {
+    width: 35px;
+    height: 30px;
+    border-radius: 12px;
+    background-color: #efefef;
+    font: 700 14px/2 "Microsoft YaHei", sans-serif; 
+}
+
+.top {
+    position: relative;
+    left: 50%;
+    margin-left: -20px;
+}
+
+.bottom {
+    float: left;
+}
+
+#source {
+    position: absolute;
+    top: 15px;
+    left: 320px;
+}

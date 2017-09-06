@@ -468,7 +468,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	function mousewheel( event ) {
 
-        console.log('mousewheel');
+        // console.log('mousewheel');
 
 		if ( _this.enabled === false ) return;
 
@@ -483,19 +483,19 @@ THREE.TrackballControls = function ( object, domElement ) {
             case 2:
                 // Zoom in pages
                 _zoomStart.y -= event.deltaY * 0.025;
-                console.log('2');
+                // console.log('2');
                 break;
 
             case 1:
                 // Zoom in lines
                 _zoomStart.y -= event.deltaY * 0.01;
-                console.log('1');
+                // console.log('1');
                 break;
 
             default:
                 // undefined, 0, assume pixels
                 _zoomStart.y -= event.deltaY * 0.00025;
-                console.log(event.deltaY);
+                // console.log(event.deltaY);
                 break;
 
         }

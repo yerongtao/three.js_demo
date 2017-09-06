@@ -12,11 +12,21 @@
             width: 100%;
             height: 100%;
         }
+        .info {
+            position: absolute;
+            height: 25px;
+            width: 340px;
+            top: 10px;
+            left: 10px;
+            margin: auto;
+            background-color: #f0f0f0;
+        }
     </style>
 </head>
 <body onload="init()">
 
 <canvas id="mainCanvas" width="1600px" height="1200px"></canvas>
+<div class="info">鼠标左键：旋转 | 滚轮：缩放 | 鼠标右键：平移</div>
 
 <script src="js/three.js"></script>
 <script src="js/controls/TrackballControls.js"></script>
@@ -56,17 +66,31 @@
         scene.add(camera);
 
         //贴图
-        var texture = THREE.ImageUtils.loadTexture('img/crate.gif', {}, function() {
+        var texture = THREE.ImageUtils.loadTexture('img/CZ_crate.gif', {}, function() {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
             texture.repeat.set(4, 4);
             renderer.render(scene, camera);
         });
         //贴图
-        var texture1 = THREE.ImageUtils.loadTexture('img/tietu.jpg', {}, function() {
+        var texture1 = THREE.ImageUtils.loadTexture('img/CZ_tietu.jpg', {}, function() {
             texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
             texture1.repeat.set(4, 4);
             renderer.render(scene, camera);
         });
+
+        //贴图
+        var texture2 = THREE.ImageUtils.loadTexture('img/CZ_chess.png', {}, function() {
+            texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
+            texture2.repeat.set(4, 4);
+            renderer.render(scene, camera);
+        });
+        //贴图
+        var texture3 = THREE.ImageUtils.loadTexture('img/1.jpg', {}, function() {
+            texture3.wrapS = texture3.wrapT = THREE.RepeatWrapping;
+            renderer.render(scene, camera);
+        });
+
+
         //平面
         var planes = [];
         for(var j=0;j<3;j++){
@@ -86,7 +110,7 @@
         // scene.add(planes[2]);
 
         //墙体模型
-        car2(scene, texture);
+        car2(scene, texture, texture2, texture3);
 
         drawAxes(scene);
 
@@ -152,80 +176,110 @@
         scene.add(zAxis);
     }
 
-
     //墙体模型
-    function car2(scene, texture) {
-        var cube = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 122.50, 10, 5, 5),
+    function car2(scene, texture, texture2, texture3) {
+        var cube = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 122.50),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube.position.set(-32.70, 5, 0);
         cube.castShadow = true;
         scene.add(cube);
 
-        var cube1 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 56.30, 10, 5, 5),
+        var cube1 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 56.30),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube1.position.set(37.80, 5, 34.1);
         cube1.castShadow = true;
         scene.add(cube1);
 
-        var cube2 = new THREE.Mesh(new THREE.CubeGeometry(10.70, 10, 2, 10, 5, 5),
+        var cube2 = new THREE.Mesh(new THREE.CubeGeometry(10.70, 10, 2),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube2.position.set(43.15, 5, 5.05);
         cube2.castShadow = true;
         scene.add(cube2);
 
-        var cube3 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 55.80, 10, 5, 5),
+        var cube3 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 55.80),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube3.position.set(48.50, 5, -33.95);
         cube3.castShadow = true;
         scene.add(cube3);
 
-        var cube4 = new THREE.Mesh(new THREE.CubeGeometry(70.10, 10, 2, 10, 5, 5),
+        var cube4 = new THREE.Mesh(new THREE.CubeGeometry(70.10, 10, 2),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube4.position.set(2.35, 5, 61.25);
         cube4.castShadow = true;
         scene.add(cube4);
 
-        var cube5 = new THREE.Mesh(new THREE.CubeGeometry(80.80, 10, 2, 10, 5, 5),
+        var cube5 = new THREE.Mesh(new THREE.CubeGeometry(80.80, 10, 2),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube5.position.set(7.70, 5, -61.25);
         cube5.castShadow = true;
         scene.add(cube5);
 
-        var cube6 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50, 10, 5, 5),
+        var cube6 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube6.position.set(0, 5, 35);
         cube6.castShadow = true;
         scene.add(cube6);
 
-        var cube7 = new THREE.Mesh(new THREE.CubeGeometry(20.60, 10, 2, 10, 5, 5),
+        var cube7 = new THREE.Mesh(new THREE.CubeGeometry(20.60, 10, 2),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube7.position.set(19.30, 5, -7.50);
         cube7.castShadow = true;
         scene.add(cube7);
 
-        var cube8 = new THREE.Mesh(new THREE.CubeGeometry(30.60, 10, 2, 10, 5, 5),
+        var cube8 = new THREE.Mesh(new THREE.CubeGeometry(30.60, 10, 2),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube8.position.set(-16.50, 5, 0);
         cube8.castShadow = true;
         scene.add(cube8);
 
-        var cube9 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50, 10, 5, 5),
+        var cube9 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.50),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube9.position.set(0, 5, -35);
         cube9.castShadow = true;
         scene.add(cube9);
 
-        var cube10 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.80, 10, 5, 5),
+        var cube10 = new THREE.Mesh(new THREE.CubeGeometry(2, 10, 52.80),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube10.position.set(30.6, 5, -33.80);
         cube10.castShadow = true;
         scene.add(cube10);
 
-        var cube11 = new THREE.Mesh(new THREE.CubeGeometry(8.60, 10, 2, 10, 5, 5),
+        var cube11 = new THREE.Mesh(new THREE.CubeGeometry(8.60, 10, 2),
             new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture}));
         cube11.position.set(43.30, 5, -7.00);
         cube11.castShadow = true;
         scene.add(cube11);
+
+        var cube12 = new THREE.Mesh(new THREE.CubeGeometry(8, 3, 18),
+            new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+        cube12.position.set(10.00, 1, 40.00);
+        cube12.castShadow = true;
+        scene.add(cube12);
+
+        var cube13 = new THREE.Mesh(new THREE.CubeGeometry(10, 3, 10),
+            new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+        cube13.position.set(-15.00, 1, 40.00);
+        cube13.castShadow = true;
+        scene.add(cube13);
+
+        var cube14 = new THREE.Mesh(new THREE.CubeGeometry(15, 3, 10),
+            new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+        cube14.position.set(-15.00, 1, -45.00);
+        cube14.castShadow = true;
+        scene.add(cube14);
+
+        var cube15 = new THREE.Mesh(new THREE.CubeGeometry(10, 3, 10),
+            new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture2}));
+        cube15.position.set(15.00, 1, -25.00);
+        cube15.castShadow = true;
+        scene.add(cube15);
+
+        var cube16 = new THREE.Mesh(new THREE.CubeGeometry(3, 3, 3),
+            new THREE.MeshLambertMaterial({color: 0xaaaaaa, map: texture3}));
+        cube16.position.set(10.00, 4, 40.00);
+        cube16.castShadow = true;
+        scene.add(cube16);
+
     }
 </script>
 </body>

@@ -65,7 +65,7 @@
             }
 
             //一个黑白格
-            var textureChess = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
+            var textureChess = THREE.ImageUtils.loadTexture('../img/CZ_chess.png', {}, function() {
                 renderer.render(scene, camera);//重绘函数
             });
             var materialChess = new THREE.MeshLambertMaterial({
@@ -73,7 +73,7 @@
             });
 
             //棋盘格:是8横8纵64个小方格
-            var textureChessA = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
+            var textureChessA = THREE.ImageUtils.loadTexture('../img/CZ_chess.png', {}, function() {
                 renderer.render(scene, camera);//重绘函数
             });
             textureChessA.wrapS = textureChessA.wrapT = THREE.RepeatWrapping;//指定重复方式为两个方向（wrapS和wrapT）都重复

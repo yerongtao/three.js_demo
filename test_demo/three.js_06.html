@@ -42,11 +42,12 @@
             renderer = new THREE.WebGLRenderer({
                 canvas: document.getElementById('mainCanvas')
             });
+            renderer.setClearColor(0x333333);
             //场景
             scene = new THREE.Scene();
             //照相机
             camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
-            camera.position.set(5, 10, 20);
+            camera.position.set(10, 6, 12);
             camera.lookAt(new THREE.Vector3(0, 3, 0));
             scene.add(camera);
 
@@ -59,7 +60,7 @@
             scene.add(ballMesh);
 
             //平面plane
-            var texture = THREE.ImageUtils.loadTexture("../img/chess.png", {}, function () {
+            var texture = THREE.ImageUtils.loadTexture("../img/CZ_chess.png", {}, function () {
                 renderer.render(scene, camera);
             });
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -69,6 +70,7 @@
             }));
             plane.rotation.x = -Math.PI / 2;
             scene.add(plane);
+
 
             light = new THREE.DirectionalLight(0xffffff);
             light.position.set(10, 10, 15);
@@ -118,7 +120,7 @@
     </script>
 </head>
 <body onload="init()">
-<canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+<canvas id="mainCanvas" width="800px" height="600px" ></canvas>
 <button id="dropBtn"  onclick="drop()">drop</button>
 <button id="dropBtn2"  onclick="stop()">stop</button>
 </body>
