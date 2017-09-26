@@ -29,14 +29,22 @@ var jzf_loading=function (images,firstPage) {
 			onLeave:function(index,nextIndex,direction) {
 				$(this).find('.jzf_component').trigger('onLeave');
                 if (index == 1) {
-                    $(".myB").fadeIn(1000);
+                    $(".myB").fadeIn(400);
                     $(".myB").show();
                 } else {
                     // $(".myB").fadeOut(500);
                     $(".myB").hide()
                 }
+
 			},
 			afterLoad:function(anchorLink,index) {
+				if (index == 2) {
+					$(".myB").fadeIn(400);
+					$(".myB").show();
+				} else {
+					// $(".myB").fadeOut(500);
+					$(".myB").hide()
+				}
 
                 $(".myB").fadeIn(1000);
 

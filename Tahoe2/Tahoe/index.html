@@ -57,12 +57,12 @@
 </div>
 
 <div class="myB">
-    <div class="bBackgroud">
+   <!-- <div class="bBackgroud">
         <img src="img/CBD_1.png" alt="">
     </div>
     <div class="bBackgroud2">
         <img src="img/整体.png" alt="">
-    </div>
+    </div>-->
     <div class="bMessage">
         <a href="#" data-num=3>
             <div></div>
@@ -121,10 +121,12 @@
 <script type="text/javascript">
 
     var a = window.innerHeight;
+
     var sc = 1334 / a;
     var b = ((a - 510) / 2) * sc - 54.5;
+
     var c = a / 37.5 - 54.5 / 37.5;
-    var d = c * 0.9577259475218659
+    var d = c * 0.9577259475218659;
 
     console.log(c);
     console.log(d);
@@ -178,12 +180,22 @@
             })
 
             .addPage('dh')/* 竖导航页 */
-            .addComponent('nav', {
-                width: 750 / 37.5,
-                height: 1334 / 37.5,
-                bg: 'img/CBD.png',
-                css: {opacity: 1, width: '100%', height: '100%', backgroundSize: 'cover'}
-            })
+                .addComponent('nav', {
+                    width: 750 / 37.5,
+                    height: 1334 / 37.5,
+                    bg: 'img/CBD.png',
+                    css: {opacity: 1, width: '100%', height: '100%', backgroundSize: 'cover'}
+                })
+
+                .addComponent('nav_1', {
+                    width: 204 / 37.5,
+                    height: 1334 / 37.5,
+                    bg: 'img/CBD_2.png',
+                    css: {opacity: 0,marginLeft:"0rem", backgroundSize: 'cover'},
+                    animateIn: {opacity: 1,marginLeft:"0.6rem"},
+                    animateOut: {opacity: 0,marginLeft:"0rem"}
+//                    delay: 400
+                })
 
             .addPage('slide')/* 秦禾品牌 */
             .addComponent('tahoe', {
@@ -273,7 +285,7 @@
                 width: 750 / 37.5,
                 height: 1253 / 37.5,
                 bg: 'img/location.png',
-                css: {opacity: 1, width: '100%', height: '100%', backgroundSize: 'cover'}
+                css: {opacity: 1/*, width: '100%', height: '90%',*/, backgroundSize: 'contain',transform: 'translateY(-30px)'}
 //                    animateIn:{opacity:1},
 //                    animateOut:{opacity:0}
             })
@@ -281,8 +293,8 @@
             .addPage('abc')/* 新中式华庭 */
             .addComponent('show_1', {
                 center: true,
-                width: 675 / 37.5,
-                height: 121 / 37.5,
+                width: 675 / 40,
+                height: 121 / 40,
                 bg: 'img/layout/kun-m.png',
                 css: {opacity: 0, marginTop: "1.3rem"},
                 animateIn: {opacity: 1, marginTop: "1.3rem"},
@@ -291,8 +303,8 @@
             })
             .addComponent('show_2', {
                 center: true,
-                width: 675 / 37.5,
-                height: 183 / 37.5,
+                width: 675 / 40,
+                height: 183 / 40,
                 bg: 'img/layout/kun.png',
                 css: {opacity: 0, marginTop: '3.15rem'},
                 animateIn: {marginTop: '3.15rem', opacity: 1},
@@ -301,20 +313,20 @@
             })
             .addComponent('show_3', {
                 center: true,
-                width: d,
-                height: c,
+                width: 675 / 45,
+                height: 705 / 45,
                 bg: 'img/layout/kun-xl.png',
-                css: {opacity: 0, /*marginTop: "5.9rem",*/bottom:"1.7rem"},
-                animateIn: {/*marginTop: "5.9rem",*/ opacity: 1},
-                animateOut: {/*marginTop: "5.9rem",*/ opacity: 0},
+                css: {opacity: 0, marginTop: "5.8rem"/*bottom:"1.7rem"*/},
+                animateIn: {marginTop: "5.8rem", opacity: 1},
+                animateOut: {marginTop: "5.8rem", opacity: 0},
                 delay: 1200
             })
 
             .addPage('abcd')/* 新中式华庭 */
             .addComponent('show_1', {
                 center: true,
-                width: 675 / 37.5,
-                height: 121 / 37.5,
+                width: 675 / 40,
+                height: 121 / 40,
                 bg: 'img/layout/yi-m.png',
                 css: {opacity: 0, marginTop: "1.3rem"},
                 animateIn: {opacity: 1, marginTop: "1.3rem"},
@@ -323,8 +335,8 @@
             })
             .addComponent('show_2', {
                 center: true,
-                width: 675 / 37.5,
-                height: 189 / 37.5,
+                width: 675 / 40,
+                height: 189 / 40,
                 bg: 'img/layout/yi.png',
                 css: {opacity: 0, marginTop: '3.15rem'},
                 animateIn: {marginTop: '3.15rem', opacity: 1},
@@ -333,20 +345,20 @@
             })
             .addComponent('show_3', {
                 center: true,
-                width: d,
-                height: c,
+                width: 675 / 45,
+                height: 705 / 45,
                 bg: 'img/layout/yi-xl.png',
-                css: {opacity: 0,/* marginTop: "5.9rem",*/bottom:"1.7rem"},
-                animateIn: {/*marginTop: "5.9rem",*/ opacity: 1},
-                animateOut: {/*marginTop: "5.9rem", */opacity: 0},
+                css: {opacity: 0, marginTop: "5.9rem"/*,bottom:"1.7rem"*/},
+                animateIn: {marginTop: "5.9rem", opacity: 1},
+                animateOut: {marginTop: "5.9rem", opacity: 0},
                 delay: 1200
             })
 
             .addPage('abcde')/* 新中式华庭 */
             .addComponent('show_1', {
                 center: true,
-                width: 675 / 37.5,
-                height: 121 / 37.5,
+                width: 675 / 40,
+                height: 121 / 40,
                 bg: 'img/layout/han-m.png',
                 css: {opacity: 0, marginTop: "1.3rem"},
                 animateIn: {opacity: 1, marginTop: "1.3rem"},
@@ -355,8 +367,8 @@
             })
             .addComponent('show_2', {
                 center: true,
-                width: 675 / 37.5,
-                height: 199 / 37.5,
+                width: 675 / 40,
+                height: 199 / 40,
                 bg: 'img/layout/han.png',
                 css: {opacity: 0, marginTop: '3.15rem'},
                 animateIn: {marginTop: '3.15rem', opacity: 1},
@@ -365,12 +377,12 @@
             })
             .addComponent('show_3', {
                 center: true,
-                width: d,
-                height: c,
+                width: 675 / 45,
+                height: 705 / 45,
                 bg: 'img/layout/han-xl.png',
-                css: {opacity: 0,/* marginTop: "5.9rem",*/bottom:"1.7rem"},
-                animateIn: {/*marginTop: "5.9rem",*/ opacity: 1},
-                animateOut: {/*marginTop: "5.9rem",*/ opacity: 0},
+                css: {opacity: 0, marginTop: "5.9rem"/*,bottom:"1.7rem"*/},
+                animateIn: {marginTop: "5.9rem", opacity: 1},
+                animateOut: {marginTop: "5.9rem", opacity: 0},
                 delay: 1200
             })
 

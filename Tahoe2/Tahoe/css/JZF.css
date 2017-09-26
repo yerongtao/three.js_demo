@@ -152,3 +152,7 @@ a {
     position: relative;
     top: 15px;
 }
+
+.jzf_page_qw>.fp-tableCell{
+    background-color: #cab37d;
+}
