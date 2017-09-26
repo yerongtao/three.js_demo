@@ -34,7 +34,6 @@
 <!-- 下方导航栏 -->
 <div class="myA">
     <div>
-        <!--<img src="img/装饰.png" alt="" style="width: 43px;height: 10px;right: 5px;bottom: 1px;float: right;position: relative;">-->
         <img src="img/区位底图.png" alt="" style="width: 100%;bottom: -4px;position: relative;">
     </div>
 </div>
@@ -57,12 +56,6 @@
 </div>
 
 <div class="myB">
-   <!-- <div class="bBackgroud">
-        <img src="img/CBD_1.png" alt="">
-    </div>
-    <div class="bBackgroud2">
-        <img src="img/整体.png" alt="">
-    </div>-->
     <div class="bMessage">
         <a href="#" data-num=3>
             <div></div>
@@ -103,6 +96,15 @@
     </a>
 </div>
 
+<span id="musicControl">
+        <a id="mc_play" class="on" onclick="play_music();">
+            <audio id="musicfx" loop="loop" autoplay="autoplay">
+                <source src="mp3/Dreams.mp3" type="audio/mpeg">
+            </audio>
+        </a>
+ </span>
+
+
 
 <!-- 加载 H5组件 相关资源 -->
 <script type="text/javascript">
@@ -120,21 +122,8 @@
 <!-- 主要页面逻辑 -->
 <script type="text/javascript">
 
-    var a = window.innerHeight;
-
-    var sc = 1334 / a;
-    var b = ((a - 510) / 2) * sc - 54.5;
-
-    var c = a / 37.5 - 54.5 / 37.5;
-    var d = c * 0.9577259475218659;
-
-    console.log(c);
-    console.log(d);
-
-
     $(function () {
         var jzf = new JZF();
-
         jzf
             .addPage('face')/* 首页 */
             .addComponent('face', {
@@ -172,7 +161,6 @@
                 delay: 500
             })
             .addComponent('face', {
-//                        center:true,
                 width: 85 / 37.5,
                 height: 19 / 37.5,
                 bg: 'img/logo-1.png',
@@ -180,22 +168,22 @@
             })
 
             .addPage('dh')/* 竖导航页 */
-                .addComponent('nav', {
-                    width: 750 / 37.5,
-                    height: 1334 / 37.5,
-                    bg: 'img/CBD.png',
-                    css: {opacity: 1, width: '100%', height: '100%', backgroundSize: 'cover'}
-                })
+            .addComponent('nav', {
+                width: 730 / 37.5,
+                height: 1334 / 37.5,
+                bg: 'img/CBD.png',
+                css: {opacity: 1, width: '100%', height: '100%', backgroundSize: 'cover'}
+            })
 
-                .addComponent('nav_1', {
-                    width: 204 / 37.5,
-                    height: 1334 / 37.5,
-                    bg: 'img/CBD_2.png',
-                    css: {opacity: 0,marginLeft:"0rem", backgroundSize: 'cover'},
-                    animateIn: {opacity: 1,marginLeft:"0.6rem"},
-                    animateOut: {opacity: 0,marginLeft:"0rem"}
+            .addComponent('nav_1', {
+                width: 204 / 37.5,
+                height: 1334 / 37.5,
+                bg: 'img/CBD_3.png',
+                css: {opacity: 0, marginLeft: "0rem", backgroundSize: 'contain'},
+                animateIn: {opacity: 1, marginLeft: "0.6rem"},
+                animateOut: {opacity: 0, marginLeft: "0rem"}
 //                    delay: 400
-                })
+            })
 
             .addPage('slide')/* 秦禾品牌 */
             .addComponent('tahoe', {
@@ -218,7 +206,6 @@
                 delay: 500
             })
             .addComponent('face', {
-//                        center:true,
                 width: 85 / 37.5,
                 height: 19 / 37.5,
                 bg: 'img/logo-1.png',
@@ -235,10 +222,10 @@
             })
             .addComponent('tahoe_map', {
 //                    center:true,
-                width: 750 / 37.5,
+                width: 730 / 37.5,
                 height: 979 / 37.5,
                 bg: 'img/map_1.png',
-                css: {opacity: 0, margin: '1.1rem 0rem 0rem 0rem'},
+                css: {opacity: 0, margin: '1.7rem 0rem 0rem 0rem', backgroundSize: 'contain'},
                 animateIn: {opacity: 1},
                 animateOut: {opacity: 0},
                 delay: 700
@@ -285,121 +272,114 @@
                 width: 750 / 37.5,
                 height: 1253 / 37.5,
                 bg: 'img/location.png',
-                css: {opacity: 1/*, width: '100%', height: '90%',*/, backgroundSize: 'contain',transform: 'translateY(-30px)'}
-//                    animateIn:{opacity:1},
-//                    animateOut:{opacity:0}
+                css: {
+                    opacity: 1,
+                    backgroundSize: 'contain',
+                    transform: 'translateY(-30px)'
+                }
             })
 
             .addPage('abc')/* 新中式华庭 */
             .addComponent('show_1', {
                 center: true,
-                width: 675 / 40,
-                height: 121 / 40,
+                width: 675 / 37.5,
+                height: 121 / 37.5,
                 bg: 'img/layout/kun-m.png',
-                css: {opacity: 0, marginTop: "1.3rem"},
-                animateIn: {opacity: 1, marginTop: "1.3rem"},
-                animateOut: {opacity: 0, marginTop: "1.3rem"},
+                css: {opacity: 0, marginTop: "1.5rem"},
+                animateIn: {opacity: 1, marginTop: "1.5rem"},
+                animateOut: {opacity: 0, marginTop: "1.5rem"},
                 delay: 400
             })
             .addComponent('show_2', {
                 center: true,
-                width: 675 / 40,
-                height: 183 / 40,
+                width: 675 / 37.5,
+                height: 183 / 37.5,
                 bg: 'img/layout/kun.png',
-                css: {opacity: 0, marginTop: '3.15rem'},
-                animateIn: {marginTop: '3.15rem', opacity: 1},
-                animateOut: {marginTop: '3.15rem', opacity: 0},
+                css: {opacity: 0, marginTop: '3.45rem'},
+                animateIn: {marginTop: '3.45rem', opacity: 1},
+                animateOut: {marginTop: '3.45rem', opacity: 0},
                 delay: 800
             })
             .addComponent('show_3', {
                 center: true,
-                width: 675 / 45,
-                height: 705 / 45,
-                bg: 'img/layout/kun-xl.png',
-                css: {opacity: 0, marginTop: "5.8rem"/*bottom:"1.7rem"*/},
-                animateIn: {marginTop: "5.8rem", opacity: 1},
-                animateOut: {marginTop: "5.8rem", opacity: 0},
+                width: 675 / 37.5,
+                height: 550 / 37.5,
+                bg: 'img/layout/kun1.png',
+                css: {opacity: 0, marginTop: "6.6rem"/*bottom:"1.7rem"*/},
+                animateIn: {marginTop: "6.6rem", opacity: 1},
+                animateOut: {marginTop: "6.6rem", opacity: 0},
                 delay: 1200
             })
 
             .addPage('abcd')/* 新中式华庭 */
             .addComponent('show_1', {
                 center: true,
-                width: 675 / 40,
-                height: 121 / 40,
+                width: 675 / 37.5,
+                height: 121 / 37.5,
                 bg: 'img/layout/yi-m.png',
-                css: {opacity: 0, marginTop: "1.3rem"},
-                animateIn: {opacity: 1, marginTop: "1.3rem"},
-                animateOut: {opacity: 0, marginTop: "1.3rem"},
+                css: {opacity: 0, marginTop: "1.5rem"},
+                animateIn: {opacity: 1, marginTop: "1.5rem"},
+                animateOut: {opacity: 0, marginTop: "1.5rem"},
                 delay: 400
             })
             .addComponent('show_2', {
                 center: true,
-                width: 675 / 40,
-                height: 189 / 40,
+                width: 675 / 37.5,
+                height: 189 / 37.5,
                 bg: 'img/layout/yi.png',
-                css: {opacity: 0, marginTop: '3.15rem'},
-                animateIn: {marginTop: '3.15rem', opacity: 1},
-                animateOut: {marginTop: '3.15rem', opacity: 0},
+                css: {opacity: 0, marginTop: '3.45rem'},
+                animateIn: {marginTop: '3.45rem', opacity: 1},
+                animateOut: {marginTop: '3.45rem', opacity: 0},
                 delay: 800
             })
             .addComponent('show_3', {
                 center: true,
-                width: 675 / 45,
-                height: 705 / 45,
-                bg: 'img/layout/yi-xl.png',
-                css: {opacity: 0, marginTop: "5.9rem"/*,bottom:"1.7rem"*/},
-                animateIn: {marginTop: "5.9rem", opacity: 1},
-                animateOut: {marginTop: "5.9rem", opacity: 0},
+                width: 675 / 37.5,
+                height: 550 / 37.5,
+                bg: 'img/layout/yi1.png',
+                css: {opacity: 0, marginTop: "6.6rem"/*,bottom:"1.7rem"*/},
+                animateIn: {marginTop: "6.6rem", opacity: 1},
+                animateOut: {marginTop: "6.6rem", opacity: 0},
                 delay: 1200
             })
 
             .addPage('abcde')/* 新中式华庭 */
             .addComponent('show_1', {
                 center: true,
-                width: 675 / 40,
-                height: 121 / 40,
+                width: 675 / 37.5,
+                height: 121 / 37.5,
                 bg: 'img/layout/han-m.png',
-                css: {opacity: 0, marginTop: "1.3rem"},
-                animateIn: {opacity: 1, marginTop: "1.3rem"},
-                animateOut: {opacity: 0, marginTop: "1.3rem"},
+                css: {opacity: 0, marginTop: "1.5rem"},
+                animateIn: {opacity: 1, marginTop: "1.5rem"},
+                animateOut: {opacity: 0, marginTop: "1.5rem"},
                 delay: 400
             })
             .addComponent('show_2', {
                 center: true,
-                width: 675 / 40,
-                height: 199 / 40,
+                width: 675 / 37.5,
+                height: 199 / 37.5,
                 bg: 'img/layout/han.png',
-                css: {opacity: 0, marginTop: '3.15rem'},
-                animateIn: {marginTop: '3.15rem', opacity: 1},
-                animateOut: {marginTop: '3.15rem', opacity: 0},
+                css: {opacity: 0, marginTop: '3.45rem'},
+                animateIn: {marginTop: '3.45rem', opacity: 1},
+                animateOut: {marginTop: '3.45rem', opacity: 0},
                 delay: 800
             })
             .addComponent('show_3', {
                 center: true,
-                width: 675 / 45,
-                height: 705 / 45,
-                bg: 'img/layout/han-xl.png',
-                css: {opacity: 0, marginTop: "5.9rem"/*,bottom:"1.7rem"*/},
-                animateIn: {marginTop: "5.9rem", opacity: 1},
-                animateOut: {marginTop: "5.9rem", opacity: 0},
+                width: 675 / 37.5,
+                height: 550 / 37.5,
+                bg: 'img/layout/han1.png',
+                css: {opacity: 0, marginTop: "6.6rem"/*,bottom:"1.7rem"*/},
+                animateIn: {marginTop: "6.6rem", opacity: 1},
+                animateOut: {marginTop: "6.6rem", opacity: 0},
                 delay: 1200
             })
 
-            /*.addPage('map')
-             .addComponent('map',{
-             /!*width:'100%',
-             height:'100%'*!/
-             })*/
-
-
-            .loader(['imgs/tail_back.png', 'imgs/tail_share.png', 'imgs/tail_slogan.png']);
+            .loader(['img/i/tail_back.png', 'img/i/tail_share.png', 'img/i/tail_slogan.png']);
 
     });
 </script>
-
 <script>
-
     /* 三个导航栏的隐藏显示问题 */
     $(".myA").hide();
     $(".myA").on('click', 'a:lt(3)', function () {
@@ -407,7 +387,6 @@
         $.fn.fullpage.moveTo(num);
         return false
     });
-
     $(".myB").hide();
     $(".myB").on('click', 'a:lt(3)', function () {
         var num = $(this).data('num');
@@ -421,17 +400,64 @@
         $.fn.fullpage.moveTo(num);
         return false
     });
+</script>
 
-    /* 竖导航页的居中显示 */
-    var W = window.innerHeight;
-    W2 = (W - 529) / 2;
-    $(".bMessage").css("margin", "" + W2 + "px 0");
-    $(".bBackgroud2").css("margin", "" + W2 + "px 0");
-
-    $("#jzf_c_tahoe_map_123").css("background-size", "100% 100%");
-
-    $("#jzf_c_show_3_123").css("width", "300px");
-
+<script>
+    function play_music(){
+        if ($('#mc_play').hasClass('on')){
+            $('#mc_play audio').get(0).pause();
+            $('#mc_play').attr('class','stop');
+        }else{
+            $('#mc_play audio').get(0).play();
+            $('#mc_play').attr('class','on');
+        }
+        $('#music_play_filter').hide();
+        event.stopPropagation(); //阻止冒泡
+    }
+    function just_play(id){
+        $('#mc_play audio').get(0).play();
+        $('#mc_play').attr('class','on');
+        if (typeof(id)!='undefined'){
+            $('#music_play_filter').hide();
+        }
+        event.stopPropagation(); //阻止冒泡
+    }
+    function is_weixn(){
+        return false;
+        var ua = navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i)=="micromessenger") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    var play_filter=document.getElementById('music_play_filter');
+    play_filter.addEventListener('click', function(){
+        just_play(1);
+    });
+    play_filter.addEventListener('touchstart', function(){
+        just_play(1);
+    });
+    play_filter.addEventListener('touchend', function(){
+        just_play(1);
+    });
+    play_filter.addEventListener('touchmove', function(){
+        just_play(1);
+    });
+    play_filter.addEventListener('mousedown', function(){
+        just_play(1);
+    });
+    play_filter.addEventListener('mouseup', function(){
+        just_play(1);
+    });
+    play_filter.addEventListener('mousemove',function(){
+        just_play(1);
+    });
+    window.onload=function(){
+        if (!is_weixn()){
+            just_play();
+        }
+    }
 </script>
 
 </body>

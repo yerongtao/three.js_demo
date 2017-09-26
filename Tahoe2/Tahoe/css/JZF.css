@@ -2,7 +2,6 @@
 body {
     margin: 0;
     padding: 0;
-    /*position: fixed;*/
     width: 100%;
     height: 100%;
 }
@@ -12,19 +11,39 @@ a {
 }
 
 @-webkit-keyframes rock {
-    0% {  transform: rotate(0deg)  }
-    5% {  transform: rotate(3deg)  }
-    10% {  transform: rotate(-4deg)  }
-    15% {  transform: rotate(3deg)  }
-    20% {  transform: rotate(-2deg)  }
-    25% {  transform: rotate(1deg)  }
-    30% {  transform: rotate(-1deg)  }
-    70% {  transform: rotate(0deg)  }
-    100% {  transform: rotate(0deg)  }
+    0% {
+        transform: rotate(0deg)
+    }
+    5% {
+        transform: rotate(3deg)
+    }
+    10% {
+        transform: rotate(-4deg)
+    }
+    15% {
+        transform: rotate(3deg)
+    }
+    20% {
+        transform: rotate(-2deg)
+    }
+    25% {
+        transform: rotate(1deg)
+    }
+    30% {
+        transform: rotate(-1deg)
+    }
+    70% {
+        transform: rotate(0deg)
+    }
+    100% {
+        transform: rotate(0deg)
+    }
 }
 
 @-webkit-keyframes back {
-    50% {  top: 20px;  }
+    50% {
+        top: 20px;
+    }
 }
 
 /* 金尊府 样式的全局开发 */
@@ -58,6 +77,7 @@ a {
     top: 30px;
     -webkit-animation: back 2s infinite 2s;
 }
+
 .myA {
     width: 100%;
     display: flex;
@@ -74,42 +94,23 @@ a {
 }
 
 .myA a img {
-    /*width: 40px;*/
     height: 0.93rem;
-    /*margin: 0 15px;*/
 }
 
 .myB {
     width: 100px;
     height: 100%;
-    /*float: left;*/
     position: fixed;
     z-index: 99;
     text-align: center;
-    /*background: url('../img/CBD_1.png') repeat-y;*/
-}
-
-.myB .bBackgroud img {
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    position: absolute;
-    left: 30px;
-}
-
-.myB .bBackgroud2 img {
-    width: 100%;
-    position: relative;
-    left: 30px;
 }
 
 .myB .bMessage {
-    margin: auto 0;
+    margin: 2.67rem 0rem;
     z-index: 99;
     position: absolute;
     top: 0;
     width: 100px;
-    /*height: 700px;*/
 }
 
 .myB a {
@@ -119,11 +120,11 @@ a {
 }
 
 .myB a div {
-    height: 80px;
-    width: 80%;
-    margin: 25px 0;
+    height: 1.58rem;
+    width: 2.267rem;
+    margin: 0.66rem 0;
     position: relative;
-    left: 35px;
+    left: 30px;
 }
 
 .myB a div:first-child {
@@ -134,10 +135,7 @@ a {
     width: 100%;
     text-align: center;
     z-index: 99;
-    /*height: 100%;*/
-    /*float: left;*/
     position: fixed;
-
 }
 
 .myC a {
@@ -153,6 +151,23 @@ a {
     top: 15px;
 }
 
-.jzf_page_qw>.fp-tableCell{
+.jzf_page_qw > .fp-tableCell {
     background-color: #cab37d;
 }
+
+
+/* music */
+@-webkit-keyframes reverseRotataZ{
+    0%{-webkit-transform: rotateZ(0deg);}
+    100%{-webkit-transform: rotateZ(-360deg);}
+}
+@-webkit-keyframes rotataZ{
+    0%{-webkit-transform: rotateZ(0deg);}
+    100%{-webkit-transform: rotateZ(360deg);}
+}
+#musicControl { position:fixed;right:10px;top:20px;margin-top:0;display:inline-block;z-index:99999999}
+#musicControl a { display:inline-block;width:25px;height:25px;overflow:hidden;background:url('../img/play.png') no-repeat;background-size:100%;}
+#musicControl a audio{width:100%;height:56px;}
+#musicControl a.stop { background-position:left bottom;}
+#musicControl a.on { background-position:0px 1px;-webkit-animation: reverseRotataZ 1.2s linear infinite;}
+#music_play_filter{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0;z-index:99999998;}
