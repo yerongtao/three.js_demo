@@ -4,29 +4,43 @@ window.onload = function() {
     var renderer = new THREE.WebGLRenderer({
         canvas: document.getElementById('main')
     });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth/2, window.innerHeight/2);
     renderer.setClearColor(0xcccccc);
     // 场景（scene）
     var scene = new THREE.Scene();
 
     // 照相机（camera）
-    var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100);
-    camera.position.set(-5, 1, 0);
-    camera.lookAt(new THREE.Vector3(0, -0.5, 0));
+    var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+  camera.position.x = 10;
+  camera.position.y = 10;
+  camera.position.z = 30;
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 
-    // 准备控制器 (OrbitControls)
-    var controls = new THREE.OrbitControls(camera);
-    controls.target = new THREE.Vector3(0, 0, 0);
-    /* 设置滚动最小值和最大值 */
-    controls.minDistance = 3.5;
-    controls.maxDistance = 8;
-    /* 设置旋转最小角度和最大角度 */
-    controls.minPolarAngle = 0;
-    controls.maxPolarAngle = Math.PI/2;
+    // // 准备控制器 (OrbitControls)
+    // var controls = new THREE.OrbitControls(camera);
+    // controls.target = new THREE.Vector3(0, 0, 0);
+    // /* 设置滚动最小值和最大值 */
+    // controls.minDistance = 3.5;
+    // controls.maxDistance = 8;
+    // /* 设置旋转最小角度和最大角度 */
+    // controls.minPolarAngle = 0;
+    // controls.maxPolarAngle = Math.PI/2;
+    // scene.add(camera);
 
+  //控制器
+  var controls = new THREE.TrackballControls(camera);
+  controls.rotateSpeed = 2.0;
+  controls.zoomSpeed = 2.4;
+  controls.panSpeed = 1.6;
+  controls.noZoom = false;
+  controls.noPan = false;
+  controls.staticMoving = true;
+  controls.dynamicDampingFactor = 0.3;
+  controls.keys = [65, 83, 68];
+  controls.addEventListener('change', render);
 
-    scene.add(camera);
+  scene.add(camera);
 
 
     // 进度条（progress bar）
@@ -42,14 +56,14 @@ window.onload = function() {
     textureFloor.wrapT = THREE.RepeatWrapping;
     textureFloor.repeat.set(6, 8);
     // 地板（plane）
-    var plane = new THREE.Mesh(new THREE.PlaneGeometry(6, 8),
-        new THREE.MeshLambertMaterial({
-            map: textureFloor
-        })
-    );
-    plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -1.15;
-    scene.add(plane);
+    // var plane = new THREE.Mesh(new THREE.PlaneGeometry(6, 8),
+    //     new THREE.MeshLambertMaterial({
+    //         map: textureFloor
+    //     })
+    // );
+    // plane.rotation.x = -Math.PI / 2;
+    // plane.position.y = -1.15;
+    // scene.add(plane);
 
     // 汽车模型（model）
     var car;
@@ -84,7 +98,7 @@ window.onload = function() {
     var aLight = new THREE.AmbientLight(0x333333);
     scene.add(aLight);
     var dLight = new THREE.DirectionalLight(0x888888);
-    dLight.position.set(-1.5, 5, 3);
+    // dLight.position.set(-1.5, 5, 3);
     scene.add(dLight);
 
 
@@ -93,7 +107,7 @@ window.onload = function() {
         // x-axis
         var xGeo = new THREE.Geometry();
         xGeo.vertices.push(new THREE.Vector3(0, 0, 0));
-        xGeo.vertices.push(new THREE.Vector3(50, 0, 0));
+        xGeo.vertices.push(new THREE.Vector3(5, 0, 0));
         var xMat = new THREE.LineBasicMaterial({
             color: 0xff0000
         });
@@ -103,7 +117,7 @@ window.onload = function() {
         // y-axis
         var yGeo = new THREE.Geometry();
         yGeo.vertices.push(new THREE.Vector3(0, 0, 0));
-        yGeo.vertices.push(new THREE.Vector3(0, 50, 0));
+        yGeo.vertices.push(new THREE.Vector3(0, 5, 0));
         var yMat = new THREE.LineBasicMaterial({
             color: 0x00ff00
         });
@@ -113,7 +127,7 @@ window.onload = function() {
         // z-axis
         var zGeo = new THREE.Geometry();
         zGeo.vertices.push(new THREE.Vector3(0, 0, 0));
-        zGeo.vertices.push(new THREE.Vector3(0, 0, 50));
+        zGeo.vertices.push(new THREE.Vector3(0, 0, 5));
         var zMat = new THREE.LineBasicMaterial({
             color: 0x00ccff
         });
